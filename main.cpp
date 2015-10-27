@@ -66,6 +66,24 @@ void test_RM_FileScan()
 	d2[32] = 0;
 	file.InsertRec(d2, rid);
 
+	for (int i = 1; i <= 10; i++)
+	{
+		r.b = i; r.f = i + 1.0 / float(i);
+		for (int j = 0; j < 24; j++)
+			r.a[j] = '0' + i + j;
+		file.InsertRec((char*)(&r), rid);
+	}
+
+	file.DeleteRec(RID(1, 3));
+
+	RM_Record rec;
+	file.GetRec(RID(1, 5), rec);
+	char *data;
+	rec.GetData(data);
+	Rec *rp = (Rec*)data;
+	rp->a[0] = '!';
+	file.UpdateRec(rec);
+
     //float a = 1.2;
     char a[25];
     for(int i = 0; i < 24; i++) a[i] = 65 + i;
@@ -76,11 +94,9 @@ void test_RM_FileScan()
     Compop compOp = EQ_OP;
     int flag = scan->OpenScan(file, attrType, 24, 8, compOp, value);
     
-    RM_Record rec;
-    
     int loc = scan->GetNextRec(rec);
     cout << rec.recordSize << ' ' << rec.rid.Page() << ' ' << rec.rid.Slot() << endl;
-    char* data = rec.data;
+    data = rec.data;
     int* dd = (int*)data;
     cout << dd[0] << endl;
     cout << loc << endl;
