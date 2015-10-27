@@ -125,7 +125,7 @@ public:
 		this->bpm = bpm;
 	}                           // Constructor
 	~RM_FileScan();                                // Destructor
-    int OpenScan(int fileID,  // Initialize file scan
+    int OpenScan(const RM_FileHandle &fileHandle,  // Initialize file scan
                 AttrType attrType,
                 int attrLength,
                 int attrOffset,
@@ -136,13 +136,13 @@ public:
     	BufType b = bpm->getPage(fileID, 0, index);
     	recordSize = b[0];
     	pageNumber = b[1];
-    	this->fileID = fileID;
+    	this->fileID = fileHandle.getFileID();
     	this->attrType = attrType;
     	this->attrLength = attrLength;
     	this->attrOffset = attrOffset;
     	this->compOp = compOp;
     	this->value = value;
-    	currentPage = 2;
+    	currentPage = 1;
     	currentRecord = 0;
 
     	if(attrType < MyINT || attrType > STRING || compOp < EQ_OP || compOp > NO_OP) 
@@ -155,7 +155,7 @@ public:
     }
 
     int GetNextRec(RM_Record &rec){	 // Get next matching record
-    	for(; currentPage < pageNumber; currentPage++){
+    	for(; currentPage <= pageNumber; currentPage++){
     		int index;
     		BufType b = bpm->getPage(fileID, currentPage, index);
     		if(findRecord(b)){

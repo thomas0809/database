@@ -125,7 +125,7 @@ public:
     	bpm->access(index);
     }
 
-    int getFileID()
+    int getFileID() const
     {
     	return fileID;
     }

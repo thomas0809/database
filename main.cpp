@@ -30,6 +30,12 @@ void test_RM_Manager()
     }
 }
 
+struct Rec{
+	int b;
+	float f;
+	char a[24];
+};
+
 void test_RM_FileScan()
 {
     FileManager* fm = new FileManager();
@@ -37,19 +43,40 @@ void test_RM_FileScan()
     RM_Manager* rm_m = new RM_Manager(fm, bpm);
     //	fm->createFile("testfile.txt"); //新建文件
     rm_m->CreateFile("testfile.txt", 32);
-    int fileID;
-    fm->openFile("testfile.txt", fileID); //打开文件，fileID是返回的文件id
+    RM_FileHandle file;
+    rm_m->OpenFile("testfile.txt", file); //打开文件，fileID是返回的文件id
     
     RM_FileScan *scan = new RM_FileScan(fm, bpm);
     //char a[25];
     //for(int i = 0; i < 24; i++) a[i] = 97 + i;
-    float a = 1.2;
+    Rec r;
+    r.b = 1; r.f = 1.2;
+    for(int i = 0; i < 24; i++) r.a[i] = 65 + i;
+   	char d[33];
+	memcpy(d, &r, 32);
+	d[32] = 0;
+	RID rid;
+	file.InsertRec(d, rid);
+
+	Rec r2;
+    r2.b = 10; r2.f = 1.2;
+    for(int i = 0; i < 24; i++) r2.a[i] = 97 + i;
+   	char d2[33];
+	memcpy(d2, &r2, 32);
+	d2[32] = 0;
+	file.InsertRec(d2, rid);
+
+    //float a = 1.2;
+    char a[25];
+    for(int i = 0; i < 24; i++) a[i] = 65 + i;
+    a[24] = 0;
+
     void* value = (void*)&a;
-    AttrType attrType = FLOAT;
+    AttrType attrType = STRING;
     Compop compOp = EQ_OP;
-    int flag = scan->OpenScan(fileID, attrType, 4, 4,compOp, value);
+    int flag = scan->OpenScan(file, attrType, 24, 8, compOp, value);
+    
     RM_Record rec;
-    cout << rec.recordSize << endl;
     
     int loc = scan->GetNextRec(rec);
     cout << rec.recordSize << ' ' << rec.rid.Page() << ' ' << rec.rid.Slot() << endl;
@@ -118,7 +145,7 @@ void test_RM_FileHandle()
 
 int main() {
     //test_RM_Manager();
-    //test_RM_FileScan();
-    test_RM_FileHandle();
+    test_RM_FileScan();
+    //test_RM_FileHandle();
 	return 0;
 }
