@@ -1,2 +1,7 @@
 .DS_Store
 Debug/*
+makefile
+testfile.txt
+/Debug/
+.cproject
+.project
