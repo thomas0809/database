@@ -1,50 +1,52 @@
-¼ÇÂ¼Ä£¿é
+è®°å½•æ¨¡å—
 
 header files:
-	RecordManager.h :	°üº¬RID£¬RM_Record, FileHead, RM_FileHandle, PFS, RM_Manager
-	rm_filescan.h	:	°üº¬RM_Filescan
-	PageHead.h		:	°üº¬PageHeadÒ³Í·Àà
-
+	
+	RecordManager.h :	åŒ…å«RIDï¼ŒRM_Record, FileHead, RM_FileHandle, PFS, RM_Manager
+	rm_filescan.h	:	åŒ…å«RM_Filescan
+	PageHead.h		:	åŒ…å«PageHeadé¡µå¤´ç±»
+	
 RM Interface:
-	RM_Manager		:	´¦ÀíRM²¿·ÖµÄĞÂ½¨£¬É¾³ı£¬´ò¿ª£¬¹Ø±ÕÎÄ¼ş¼ÇÂ¼£¬³ÌĞò½öÊµÀı»¯Ò»¸öÕâÑùµÄÀà
-						ËùÓĞÇëÇó¾ùÓÉÕâÒ»¸öÊµÀıÀ´´¦Àí
-						º¯ÊıÈçÏÂ£º
-							RM_Manager	   (PF_Manager &pfm)								:¹¹Ôìº¯Êı,	ÆäÖĞÓĞÒ³Ê½ÎÄ¼şÏµÍ³µÄ¶ÔÏó
-							~RM_Manager    ()												:Îö¹¹º¯Êı
-							int CreateFile  (const char *fileName, int recordSize)			:µ÷ÓÃFileManager::CreateFileĞÂ½¨Ò»¸öÒ³ÎÄ¼şfileName
-																							 ¸ÃÒ³ÖĞµÄËùÓĞ¼ÇÂ¼´óĞ¡¶¼ÊÇrecordSize.
-							int DestroyFile (const char *fileName)							:µ÷ÓÃFileManager::DestroyFileÉ¾³ıÎÄ¼şÃûÎªfileNameµÄÎÄ¼ş
-							int OpenFile    (const char *fileName, RM_FileHandle &fileHandle):µ÷ÓÃFileManagerManager::OpenFile´ò¿ªfileNameµÄÎÄ¼ş£¬Èç¹û´ò¿ª³É¹¦
-																							 ÄÜÍ¨¹ıfileHandle´ò¿ªRMÏà¹ØµÄÎÄ¼ş£¬ÕâÀï²»¿¼ÂÇ¶à´Î´ò¿ªÍ¬Ò»
-																							 ÎÄ¼şµÄÇé¿ö£¬Ò²²»¿¼ÂÇDestroyFile»á²Ù×÷Ò»¸öÕıÔÚ´ò¿ªµÄÎÄ¼ş¡£
-																							 Ã¿´Î´ò¿ªÍ¬Ò»¸öÎÄ¼şÓÃµÄÊÇ²»Í¬µÄfileHandle¡£
-							int CloseFile   (RM_FileHandle &fileHandle)						:Í¨¹ıfileHandle»ñµÃfileID£¬µ÷ÓÃFileManager:: CloseFile
-							
-	RM_FileHandle	:	²Ù×÷Ê¹ÓÃRM Interface´ò¿ªµÄÎÄ¼şÖĞµÄ¼ÇÂ¼
-						º¯ÊıÈçÏÂ:
-							RM_FileHandle  	()												:¹¹Ôìº¯Êı
-							~RM_FileHandle  ()												:Îö¹¹º¯Êı
-							int GetRec       (const RID &rid, RM_Record &rec) const			:Èç¹û²»´æÔÚrid£¬ĞèÒªÌáÊ¾´íÎó£¬Èç¹û³É¹¦£¬recÖĞ´æ·Å¼ÇÂ¼µÄ¿½±´
-							int InsertRec 	(char *pData, RID &rid)							:²åÈëÒ»¸öpDataÖ¸ÏòµÄÊı¾İ×÷ÎªÒ»¸öĞÂµÄ¼ÇÂ¼£¬Èç¹û³É¹¦£¬&rid½«
-																							 Ö¸ÏòÕâ¸öĞÂ²åÈë¼ÇÂ¼µÄRID
-							int DeleteRec 	(RID &rid)										:É¾³ıÎÄ¼şÖĞ¼ÇÂ¼ÎªRIDµÄ¼ÇÂ¼£¬Èç¹ûÒ³ÖĞËùº¬¼ÇÂ¼Îª¿Õ£¬µ÷ÓÃ
-																							 FileManager::DisposePage´¦Àí¸ÃÒ³
-							int UpdateRec    (RM_Record &rec)								:¸üĞÂËùÓĞºÍrecÏà¹ØµÄ¼ÇÂ¼£¬¾ßÌå¶¨Òå¼ûRM_Record
+
+	RM_Manager		:	å¤„ç†RMéƒ¨åˆ†çš„æ–°å»ºï¼Œåˆ é™¤ï¼Œæ‰“å¼€ï¼Œå…³é—­æ–‡ä»¶è®°å½•ï¼Œç¨‹åºä»…å®ä¾‹åŒ–ä¸€ä¸ªè¿™æ ·çš„ç±»
+						æ‰€æœ‰è¯·æ±‚å‡ç”±è¿™ä¸€ä¸ªå®ä¾‹æ¥å¤„ç†
+						å‡½æ•°å¦‚ä¸‹ï¼š
+							RM_Manager	   (PF_Manager &pfm)									:æ„é€ å‡½æ•°,	å…¶ä¸­æœ‰é¡µå¼æ–‡ä»¶ç³»ç»Ÿçš„å¯¹è±¡
+							~RM_Manager    ()													:ææ„å‡½æ•°
+							int CreateFile  (const char *fileName, int recordSize)				:è°ƒç”¨FileManager::CreateFileæ–°å»ºä¸€ä¸ªé¡µæ–‡ä»¶fileName
+																								 è¯¥é¡µä¸­çš„æ‰€æœ‰è®°å½•å¤§å°éƒ½æ˜¯recordSize.
+							int DestroyFile (const char *fileName)								:è°ƒç”¨FileManager::DestroyFileåˆ é™¤æ–‡ä»¶åä¸ºfileNameçš„æ–‡ä»¶
+							int OpenFile    (const char *fileName, RM_FileHandle &fileHandle)	:è°ƒç”¨FileManagerManager::OpenFileæ‰“å¼€fileNameçš„æ–‡ä»¶ï¼Œå¦‚æœæ‰“
+																								 å¼€æˆåŠŸèƒ½é€šè¿‡fileHandleæ‰“å¼€RMç›¸å…³çš„æ–‡ä»¶ï¼Œè¿™é‡Œä¸è€ƒè™‘å¤šæ¬¡æ‰“å¼€åŒä¸€
+																							 	 æ–‡ä»¶çš„æƒ…å†µï¼Œä¹Ÿä¸è€ƒè™‘DestroyFileä¼šæ“ä½œä¸€ä¸ªæ­£åœ¨æ‰“å¼€çš„æ–‡ä»¶ã€‚
+																								 æ¯æ¬¡æ‰“å¼€åŒä¸€ä¸ªæ–‡ä»¶ç”¨çš„æ˜¯ä¸åŒçš„fileHandleã€‚
+							int CloseFile   (RM_FileHandle &fileHandle)							:é€šè¿‡fileHandleè·å¾—fileIDï¼Œè°ƒç”¨FileManager:: CloseFile
+
+	RM_FileHandle	:	æ“ä½œä½¿ç”¨RM Interfaceæ‰“å¼€çš„æ–‡ä»¶ä¸­çš„è®°å½•
+						å‡½æ•°å¦‚ä¸‹:
+							RM_FileHandle  	()												:æ„é€ å‡½æ•°
+							~RM_FileHandle  ()												:ææ„å‡½æ•°
+							int GetRec       (const RID &rid, RM_Record &rec) const			:å¦‚æœä¸å­˜åœ¨ridï¼Œéœ€è¦æç¤ºé”™è¯¯ï¼Œå¦‚æœæˆåŠŸï¼Œrecä¸­å­˜æ”¾è®°å½•çš„æ‹·è´
+							int InsertRec 	(char *pData, RID &rid)							:æ’å…¥ä¸€ä¸ªpDataæŒ‡å‘çš„æ•°æ®ä½œä¸ºä¸€ä¸ªæ–°çš„è®°å½•ï¼Œå¦‚æœæˆåŠŸï¼Œ&ridå°†
+																							 æŒ‡å‘è¿™ä¸ªæ–°æ’å…¥è®°å½•çš„RID
+							int DeleteRec 	(RID &rid)										:åˆ é™¤æ–‡ä»¶ä¸­è®°å½•ä¸ºRIDçš„è®°å½•ï¼Œå¦‚æœé¡µä¸­æ‰€å«è®°å½•ä¸ºç©ºï¼Œè°ƒç”¨
+																							 FileManager::DisposePageå¤„ç†è¯¥é¡µ
+							int UpdateRec    (RM_Record &rec)								:æ›´æ–°æ‰€æœ‰å’Œrecç›¸å…³çš„è®°å½•ï¼Œå…·ä½“å®šä¹‰è§RM_Record
 																							 
-	RM_FileScan		:	Ìá¹©RMÎÄ¼ş¼ÇÂ¼µÄ¼ìË÷¹¦ÄÜ£¬¼ìË÷¹¦ÄÜÒÀÀµÓÚÖ¸¶¨µÄ¼¸¸öÌõ¼ş
-						º¯ÊıÈçÏÂ:
-							RM_FileScan  	()												:¹¹Ôìº¯Êı
-							~RM_FileScan 	()												:Îö¹¹º¯Êı
+	RM_FileScan		:	æä¾›RMæ–‡ä»¶è®°å½•çš„æ£€ç´¢åŠŸèƒ½ï¼Œæ£€ç´¢åŠŸèƒ½ä¾èµ–äºæŒ‡å®šçš„å‡ ä¸ªæ¡ä»¶
+						å‡½æ•°å¦‚ä¸‹:
+							RM_FileScan  	()												:æ„é€ å‡½æ•°
+							~RM_FileScan 	()												:ææ„å‡½æ•°
 							int OpenScan     (const RM_FileHandle &fileHandle,  
 											 AttrType      attrType,
 											 int           attrLength,
 											 int           attrOffset,
 											 CompOp        compOp,
 											 void          *value,
-											 ClientHint    pinHint = NO_HINT)				:µ±valueÎª¿ÕÖ¸ÕëÊ±£¬²éÑ¯ËùÓĞ¼ÇÂ¼£¬Èç¹û²»Îª¿ÕÊ±£¬Ö¸Ïòvalue£¬
-																							 ÓÃÓÚ²éÑ¯±È½Ï¡£attrTypeµÄ¶¨ÒåÔÚdatabase.hÖĞINT£¬FLOATºÍSTRING
-																							 attrOffsetÎª²éÑ¯¼ÇÂ¼µÄ³õÊ¼Î»ÖÃ(²éÑ¯Ä³¸ö×Ö¶ÎµÄÖµ)£¬²éÑ¯²Ù×÷¾ß
-																							 Ìå¶¨ÒåÔÚdatabase.hÖĞ
+											 ClientHint    pinHint = NO_HINT)				:å½“valueä¸ºç©ºæŒ‡é’ˆæ—¶ï¼ŒæŸ¥è¯¢æ‰€æœ‰è®°å½•ï¼Œå¦‚æœä¸ä¸ºç©ºæ—¶ï¼ŒæŒ‡å‘valueï¼Œ
+																							 ç”¨äºæŸ¥è¯¢æ¯”è¾ƒã€‚attrTypeçš„å®šä¹‰åœ¨database.hä¸­INTï¼ŒFLOATå’ŒSTRING
+																							 attrOffsetä¸ºæŸ¥è¯¢è®°å½•çš„åˆå§‹ä½ç½®(æŸ¥è¯¢æŸä¸ªå­—æ®µçš„å€¼)ï¼ŒæŸ¥è¯¢æ“ä½œå…·
+																							 ä½“å®šä¹‰åœ¨database.hä¸­
 																							 EQ_OP					equal		a = v
 																							 LT_OP					less than	a < v
 																							 GT_OP					greater than a > v
@@ -53,41 +55,42 @@ RM Interface:
 																							 NE_OP					a <> v
 																							 NO_OP					no comparison value = null
 																							 
-							int GetNextRec 	(RM_Record &rec)								:»ñÈ¡ÏÂÒ»Ìõrecord
-							int CloseScan 	()												:ÖÕÖ¹¼ìË÷
+							int GetNextRec 	(RM_Record &rec)								:è·å–ä¸‹ä¸€æ¡record
+							int CloseScan 	()												:ç»ˆæ­¢æ£€ç´¢
 							
-	RM_Record		:	Ìá¹©ÎÄ¼ş¼ÇÂ¼µÄ»ù±¾²Ù×÷
-						º¯ÊıÈçÏÂ£º
-							int Set			(char *pData, int size, RID rid_)				:ÉèÖÃ¼ÇÂ¼ÄÚÈİ
-							int GetData		(char *&pData)									:»ñÈ¡¼ÇÂ¼ÄÚÈİ
-							int GetRid		(RID &rid)										:»ñÈ¡¼ÇÂ¼RID
+	RM_Record		:	æä¾›æ–‡ä»¶è®°å½•çš„åŸºæœ¬æ“ä½œ
+						å‡½æ•°å¦‚ä¸‹ï¼š
+							int Set			(char *pData, int size, RID rid_)				:è®¾ç½®è®°å½•å†…å®¹
+							int GetData		(char *&pData)									:è·å–è®°å½•å†…å®¹
+							int GetRid		(RID &rid)										:è·å–è®°å½•RID
 							
-	RID				:	¼ÇÂ¼µÄIdentifier
-						º¯ÊıÈçÏÂ:
-							RID				()												:¹¹Ôìº¯Êı
-							~RID			()												:Îö¹¹º¯Êı
-							int GetPageNum	(int &pageNum) const							:»ñÈ¡recordµÄÒ³Êı
-							int GetSlotNum	(int &slotNum) const							:»ñÈ¡recordµÄ²Û±àºÅ
-							int Page		() const										:»ñÈ¡recordµÄÒ³Êı
-							int Slot		() const   										:»ñÈ¡recordµÄ²Û±àºÅ
+	RID				:	è®°å½•çš„Identifier
+						å‡½æ•°å¦‚ä¸‹:
+							RID				()												:æ„é€ å‡½æ•°
+							~RID			()												:ææ„å‡½æ•°
+							int GetPageNum	(int &pageNum) const							:è·å–recordçš„é¡µæ•°
+							int GetSlotNum	(int &slotNum) const							:è·å–recordçš„æ§½ç¼–å·
+							int Page		() const										:è·å–recordçš„é¡µæ•°
+							int Slot		() const   										:è·å–recordçš„æ§½ç¼–å·
 						
-	PageHead		:	Êı¾İÒ³Ò³Í·¸ñÊ½£¬ÔİÊ±¸ñÊ½ÎªÒ»¸öintºÍ84Î»µÄÎ»Í¼×é³É
-						º¯ÊıÈçÏÂ£º
-							bool getRecordHead	(int RecordID)								:²éÑ¯RecordID¶ÔÓ¦¼ÇÂ¼ÊÇ·ñ´æÔÚ
-							int setRecordHead	(int RecordID, bool IsRecord)				:ÉèÖÃRecordID¶ÔÓ¦µÄ²Û
+	PageHead		:	æ•°æ®é¡µé¡µå¤´æ ¼å¼ï¼Œæš‚æ—¶æ ¼å¼ä¸ºä¸€ä¸ªintå’Œ84ä½çš„ä½å›¾ç»„æˆ
+						å‡½æ•°å¦‚ä¸‹ï¼š
+							bool getRecordHead	(int RecordID)								:æŸ¥è¯¢RecordIDå¯¹åº”è®°å½•æ˜¯å¦å­˜åœ¨
+							int setRecordHead	(int RecordID, bool IsRecord)				:è®¾ç½®RecordIDå¯¹åº”çš„æ§½
 	
-	FileHead		:	ÎÄ¼şµÚÒ»Ò³¸ñÊ½£¬ÎÄ¼şµÚÒ»Ò³´æ´¢
-							int recordSize													:¼ÇÂ¼³¤¶È
-							int pageNumber													:Ò³µÄ¸öÊı
-							int recordPerPage												:Ã¿Ò³¼ÇÂ¼¸öÊı
-							int	recordNumber												:¼ÇÂ¼µÄ×ÜÊı
+	FileHead		:	æ–‡ä»¶ç¬¬ä¸€é¡µæ ¼å¼ï¼Œæ–‡ä»¶ç¬¬ä¸€é¡µå­˜å‚¨
+							int recordSize													:è®°å½•é•¿åº¦
+							int pageNumber													:é¡µçš„ä¸ªæ•°
+							int recordPerPage												:æ¯é¡µè®°å½•ä¸ªæ•°
+							int	recordNumber												:è®°å½•çš„æ€»æ•°
 
-²âÊÔ²¿·Ö							
-	main.cpp		:	²âÊÔ¼ÇÂ¼¹ÜÀíÄ£¿éµÄÕıÈ·ĞÔ
-						ÔÚtest_RM_FileScan()º¯ÊıÖĞ:
-						Ê×ÏÈĞÂ½¨ÎÄ¼ş£¬´ò¿ªÎÄ¼ş£¬È»ºó²åÈë32byte´óĞ¡µÄÊı¾İ£¬Êı¾İ¶¨ÒåÎª£º
+æµ‹è¯•éƒ¨åˆ†
+
+	main.cpp		:	æµ‹è¯•è®°å½•ç®¡ç†æ¨¡å—çš„æ­£ç¡®æ€§
+						åœ¨test_RM_FileScan()å‡½æ•°ä¸­:
+						é¦–å…ˆæ–°å»ºæ–‡ä»¶ï¼Œæ‰“å¼€æ–‡ä»¶ï¼Œç„¶åæ’å…¥32byteå¤§å°çš„æ•°æ®ï¼Œæ•°æ®å®šä¹‰ä¸ºï¼š
 							struct Rec{
 								int b; float f; char a[24];}
-						²âÊÔ²åÈë¼ÇÂ¼¡¢É¾³ı¼ÇÂ¼¡¢¸üĞÂ¼ÇÂ¼Óë»ñÈ¡ÊôĞÔÖµÂú×ãÌØ¶¨Ìõ¼şµÄ¼ÇÂ¼¡£
+						æµ‹è¯•æ’å…¥è®°å½•ã€åˆ é™¤è®°å½•ã€æ›´æ–°è®°å½•ä¸è·å–å±æ€§å€¼æ»¡è¶³ç‰¹å®šæ¡ä»¶çš„è®°å½•ã€‚
 
-	²âÊÔ½á¹û·ûºÏÔ¤ÆÚ
+	æµ‹è¯•ç»“æœç¬¦åˆé¢„æœŸ
