@@ -1,4 +1,8 @@
-源代码在bufmanager fileio utils目录下，还有testfilesystem.cpp
-可执行在Debug目录下，运行命令
-$./testfilesystem
-开发环境可以用eclipse
+main.cpp: 测试记录管理模块的正确性
+
+在test_RM_FileScan()函数中:
+首先新建文件，打开文件，然后插入32byte大小的数据，数据定义为：
+struct Rec{
+int b; float f; char a[24];}
+
+测试插入记录、删除记录、更新记录与获取属性值满足特定条件的记录。
