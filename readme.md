@@ -1,9 +1,9 @@
 记录模块
 
-header files：
-	PageHead.h		:	包含PageHead页头类
+header files:
 	RecordManager.h :	包含RID，RM_Record, FileHead, RM_FileHandle, PFS, RM_Manager
 	rm_filescan.h	:	包含RM_Filescan
+	PageHead.h		:	包含PageHead页头类
 	
 RM Interface:
 	RM_Manager		:	处理RM部分的新建，删除，打开，关闭文件记录，程序仅实例化一个这样的类
