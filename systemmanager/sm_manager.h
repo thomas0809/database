@@ -15,7 +15,7 @@
 #define dbName_not_exist "dbName not exist"
 #define dbName_not_right "dbName is illegal"
 #define FAIL -1
-#define MAXNAME 100
+#define MAXNAME 11
 
 using namespace std;
 
@@ -34,12 +34,12 @@ struct AttrInfo {
 
 // Used by Printer class
 struct DataAttrInfo {
-   char     relName[MAXNAME+1];  						// Relation name
-   char     attrName[MAXNAME+1]; 						// Attribute name
    int      offset;              						// Offset of attribute 
-   AttrType attrType;            						// Type of attribute 
    int      attrLength;         						 // Length of attribute
    int      indexNo;             						 // Attribute index number
+   AttrType attrType;            						// Type of attribute 
+   char     relName[MAXNAME+1];  						// Relation name
+   char     attrName[MAXNAME+1]; 						// Attribute name
    void 	setAttributes(const AttrInfo &newAttrInfo);		 //设置
    void 	print();
    DataAttrInfo(){
@@ -62,14 +62,16 @@ struct DataRelInfo {
 };
 
 void DataAttrInfo::setAttributes(const AttrInfo &newAttrInfo){
-	cout << this->attrName << ' ' << newAttrInfo.attrName << endl;
+	memset(relName, 0, MAXNAME + 1);
+	memset(attrName, 0, MAXNAME + 1);
 	strcpy(this->attrName, newAttrInfo.attrName);
 	this->attrType = newAttrInfo.attrType;
 	this->attrLength = newAttrInfo.attrLength;
 }
 
 void DataAttrInfo::print(){
-	cout << relName << ' ' << attrLength <<endl;
+//	cout << "start print" << endl;
+	cout << "TableName: " << relName << ",attrName: " << attrName <<",attrLength: " << attrLength <<endl;
 }
 
 class Log{
@@ -142,6 +144,7 @@ int SM_Manager::CloseDb(){
 		return FAIL;
 	}
 	rmm.CloseFile(attrfh);
+	chdir("..");
 //	rmm.CloseFile(relfh);
 	IsOpenDB = false;
 	return 0;
@@ -154,6 +157,8 @@ int SM_Manager::CreateTable (const char *relName,                // 创建表, 这里
 		myLog->LogDebug(dbName_not_right);
 		return FAIL;
 	}	
+	int fileID = attrfh.getFileID();
+//	cout << "fileID " << fileID << endl;
 	DataAttrInfo* d = new DataAttrInfo[attrCount];
 	for (int i = 0; i < attrCount; i++)
 		d[i] = DataAttrInfo();
@@ -167,6 +172,21 @@ int SM_Manager::CreateTable (const char *relName,                // 创建表, 这里
 		strcpy (d[i].relName, relName);
 		returnCode = attrfh.InsertRec((char*) &d[i], rid);
 	}
+/*	for (int pageID = 0; pageID < 2; ++ pageID) {
+        int index;
+        //为pageID获取一个缓存页
+        BufType b = rmm.getBufPageManager()->getPage(fileID, pageID, index);
+        cout << b[0] << "---";
+		int i = 24;
+		for (int j = 0; j < 3; j++){
+			for (int k = 0; k < 10; k++){
+				cout << b[i + j*10 + k] << ' ';
+			}
+			cout << "---";
+		}
+		cout << endl;
+		rmm.getBufPageManager()->access(index); //标记访问
+    }*/
 /*	DataRelInfo rel;
 	strcpy(rel.relName, relName);
 	rel.relLength = size;
@@ -187,7 +207,7 @@ int SM_Manager::DropTable (const char * deleteRelName){
 	}
 	rfs.CloseScan();*/
 	//打开attr文件，查询所有relName属性 = deleteRelName的记录，删除该记录
-	rfs.OpenScan(attrfh, STRING, strlen(deleteRelName), 4, EQ_OP, (void*)deleteRelName);
+	rfs.OpenScan(attrfh, STRING, strlen(deleteRelName), 16, EQ_OP, (void*)deleteRelName);
 	while (rfs.GetNextRec(rec) != -1){
 		attrfh.DeleteRec(rec.rid);
 	}
@@ -198,19 +218,24 @@ int SM_Manager::DropTable (const char * deleteRelName){
 int SM_Manager::ShowTable (const char *readRelName){
 	//打开attr文件，查询所有relName属性 = readRelName的记录， 打印该记录
 	RM_FileScan rfs = RM_FileScan(rmm.getFileManager(), rmm.getBufPageManager());	
-	RM_Record rec;
-	rfs.OpenScan(attrfh, STRING, strlen(readRelName), 4, EQ_OP, (void*)readRelName);
+ 	RM_Record rec;
+	int returnCode;
+//	cout << "ShowTable" << endl;
+	returnCode = rfs.OpenScan(attrfh, STRING, strlen(readRelName), 16, EQ_OP, (void*)readRelName);
 	int x = 0;
-	cout << "TableName : "<< readRelName << endl;
-	while (1){
+//	cout << "TableName : "<< readRelName << endl;
+	while (returnCode == 1){
+//		cout << "ret : 1" << endl;
 		x = rfs.GetNextRec(rec);
+//		cout << "ret : 2" << endl;
 		if (x == -1)
 			break;
+//		cout << x << endl;
 		DataAttrInfo * mydata;
 		rec.GetData((char*&) mydata);
 		mydata->print();
 	}
-	cout << "Table End" << endl;
+//	cout << "Table End" << endl;
 	rfs.CloseScan();
 	return 0;
 }

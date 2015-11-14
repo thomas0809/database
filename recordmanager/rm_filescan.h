@@ -107,12 +107,16 @@ class RM_FileScan {
 				}
 				if(attrType == STRING){
 					char* v1 = new char[attrLength + 1];
+					char* v2 = new char[attrLength + 1];
 					int offset = (96 + currentRecord * recordSize + attrOffset) / 4;
 					memcpy(v1, b + offset, attrLength);
+					memcpy(v2, value, attrLength);
 					v1[attrLength] = '\0';
-					char* v2 = (char*)value;
+//					char* v2 = (char*)value;
+//					cout << "he" << endl;
 					v2[attrLength] = '\0';
-					cout << v1 << ' ' << v2 << endl;
+//					cout << "he" << endl;
+//					cout << v1 << ' ' << v2 << endl;
 					if(CondSTRING(v1, v2)) return true;
 				}
 			}
@@ -136,6 +140,10 @@ public:
                 void *value,
                 ClientHint pinHint = NO_HINT){
     	int index;
+		this->fileID = fileHandle.getFileID();
+//		cout << "in OpenScan " << fileID << endl;
+		if (bpm == NULL)
+			cout << "in RM_FileScan buffermannager is NULL" <<endl;
     	BufType b = bpm->getPage(fileID, 0, index);
     	recordSize = b[0];
     	pageNumber = b[1];
@@ -147,7 +155,6 @@ public:
     	this->value = value;
     	currentPage = 1;
     	currentRecord = 0;
-
     	if(attrType < MyINT || attrType > STRING || compOp < EQ_OP || compOp > NO_OP) 
     		return 0;
     	if((attrType == MyINT && attrLength != 4) || (attrType == FLOAT && attrLength != 4) || (attrType == STRING && attrLength < 0))
@@ -161,12 +168,15 @@ public:
     	for(; currentPage <= pageNumber; currentPage++){
     		int index;
     		BufType b = bpm->getPage(fileID, currentPage, index);
+//			cout << "hi" << endl;
     		if(findRecord(b)){
+//				cout << "ha" << endl;
     			RID rid(currentPage, currentRecord);
     			char* pdata = (char*)(b + 24 + (currentRecord * recordSize) / 4);
     			rec.Set(pdata, recordSize, rid);
     			return currentRecord++;
     		}
+//			cout << "ho" << endl;
     		currentRecord = 0;
     	}
     	return -1;

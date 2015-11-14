@@ -185,6 +185,7 @@ public:
     		cout << "file not found" << endl;
     	myFileManager->createFile(fileName);
     	myFileManager->openFile(fileName, fileID);
+		cout << "log: fileID " <<fileID << endl;
     	BufType b = bpm->allocPage(fileID, pageID, index, false);
     	bpm->markDirty(index);
     	cout << "log: recordSize " << recordSize <<endl;
@@ -198,6 +199,7 @@ public:
     	//memcpy(b1, pfs, sizeof(PFS));
     	b = bpm->getPage(fileID, pageID, index);
     	cout << "log: test page head" << b[0] << endl;
+		bpm->close();
     	myFileManager->closeFile(fileID);
     	return 0;
     }

@@ -13,7 +13,7 @@
 #include <iostream>
 #include <direct.h> 
 
-#define MAXNAME 100
+#define MAXNAME 11
 
 using namespace std;
 
@@ -165,20 +165,24 @@ void test_RM_FileHandle()
 
 void test_SM_Manager(){
 	char command[80] = "create ";
+	char command1[80] = "rm -r ";
 	char dbname[10] = "1";
+	int whetherDel = 0;
 	FileManager* fm = new FileManager();
 	BufPageManager* bpm = new BufPageManager(fm);
 	RM_Manager* rm_m = new RM_Manager(fm, bpm);
 	SM_Manager* sm_m = new SM_Manager(*rm_m);
-	//createFile
+	//create File
 	system (strcat(command, dbname));
 	chdir("1");
+	cout << sizeof(DataAttrInfo) << endl;
 	rm_m->CreateFile("attrcat", sizeof(DataAttrInfo));
 	rm_m->CreateFile("relcat", sizeof(DataRelInfo));
 	chdir("..");
+	//use File
 	sm_m->OpenDb("1");
 	cout << "yes" << endl;
-	AttrInfo x[2];
+	AttrInfo x[3];
 	string str = "lalala";
 	x[0].attrName = (char *)str.c_str();
 	x[0].attrType = MyINT;
@@ -187,9 +191,32 @@ void test_SM_Manager(){
 	x[1].attrName = (char *)str1.c_str();
 	x[1].attrType = MyINT;
 	x[1].attrLength = 4;
+	string str2 = "kakaka";
+	x[2].attrName = (char *)str2.c_str();
+	x[2].attrType = MyINT;
+	x[2].attrLength = 4;
+	sm_m->CreateTable("a", 2, &x[0]);
+	sm_m->CreateTable("b", 3, &x[0]);
+	sm_m->CreateTable("a", 1, &x[2]);
 	sm_m->CloseDb();
-	cout << "yes1" << endl;
-	sm_m->CreateTable("1", 2, &x[0]);
+	sm_m->OpenDb("1");
+	cout << "======show a======" << endl;
+	sm_m->ShowTable("a");
+	cout << "======show b======" << endl;
+	sm_m->ShowTable("b");
+	cout << "======drop a======" << endl;
+	sm_m->DropTable("a");
+	cout << "======show a======" << endl;
+	sm_m->ShowTable("a");
+	cout << "======show b======" << endl;
+	sm_m->ShowTable("b");
+	sm_m->CloseDb();
+	//drop File
+	cout << "Clean? " << endl;
+	cin >> whetherDel;
+	if (whetherDel == 0){
+		system (strcat(command1, dbname));
+	}
 	return;
 }
 
