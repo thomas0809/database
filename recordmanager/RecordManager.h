@@ -74,6 +74,7 @@ public:
 
     // Return the RID associated with the record
     int GetRid (RID &rid) const;
+	
 //private:
     int recordSize;
     char *data;
@@ -169,6 +170,13 @@ public:
     }
     ~RM_Manager   ();
 
+	FileManager* getFileManager(){
+		return myFileManager;
+	}
+	
+	BufPageManager* getBufPageManager(){
+		return bpm;
+	}
     int CreateFile (const char *fileName, int recordSize){
     	int index;
     	int fileID;
@@ -176,7 +184,7 @@ public:
     	if (myFileManager == NULL)
     		cout << "file not found" << endl;
     	myFileManager->createFile(fileName);
-    	myFileManager->openFile("testfile.txt", fileID);
+    	myFileManager->openFile(fileName, fileID);
     	BufType b = bpm->allocPage(fileID, pageID, index, false);
     	bpm->markDirty(index);
     	cout << "log: recordSize " << recordSize <<endl;
@@ -200,6 +208,7 @@ public:
     int OpenFile   (const char *fileName, RM_FileHandle &fileHandle){
     	int fileID;
     	myFileManager->openFile(fileName, fileID);
+		cout << fileName << ' ' << fileID << endl;
     	fileHandle.Open(bpm, fileID);
         return 0;
     }

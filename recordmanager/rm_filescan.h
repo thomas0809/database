@@ -124,7 +124,10 @@ public:
 		myFileManager = pfm;
 		this->bpm = bpm;
 	}                           // Constructor
-	~RM_FileScan();                                // Destructor
+	~RM_FileScan(){
+		myFileManager = NULL;
+		bpm = NULL;
+	}											// Destructor
     int OpenScan(const RM_FileHandle &fileHandle,  // Initialize file scan
                 AttrType attrType,
                 int attrLength,
@@ -170,5 +173,4 @@ public:
     }
     int CloseScan() {return 0;}                               // Terminate file scan
 };
-
 #endif

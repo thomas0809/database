@@ -9,7 +9,11 @@
 #include "utils/pagedef.h"
 #include "recordmanager/RecordManager.h"
 #include "recordmanager/rm_filescan.h"
+#include "systemmanager/sm_manager.h"
 #include <iostream>
+#include <direct.h> 
+
+#define MAXNAME 100
 
 using namespace std;
 
@@ -159,9 +163,40 @@ void test_RM_FileHandle()
 	printf("%s\n", data);
 }
 
+void test_SM_Manager(){
+	char command[80] = "create ";
+	char dbname[10] = "1";
+	FileManager* fm = new FileManager();
+	BufPageManager* bpm = new BufPageManager(fm);
+	RM_Manager* rm_m = new RM_Manager(fm, bpm);
+	SM_Manager* sm_m = new SM_Manager(*rm_m);
+	//createFile
+	system (strcat(command, dbname));
+	chdir("1");
+	rm_m->CreateFile("attrcat", sizeof(DataAttrInfo));
+	rm_m->CreateFile("relcat", sizeof(DataRelInfo));
+	chdir("..");
+	sm_m->OpenDb("1");
+	cout << "yes" << endl;
+	AttrInfo x[2];
+	string str = "lalala";
+	x[0].attrName = (char *)str.c_str();
+	x[0].attrType = MyINT;
+	x[0].attrLength = 4;
+	string str1 = "hahaha";
+	x[1].attrName = (char *)str1.c_str();
+	x[1].attrType = MyINT;
+	x[1].attrLength = 4;
+	sm_m->CloseDb();
+	cout << "yes1" << endl;
+	sm_m->CreateTable("1", 2, &x[0]);
+	return;
+}
+
 int main() {
     //test_RM_Manager();
-    test_RM_FileScan();
+    //test_RM_FileScan();
     //test_RM_FileHandle();
+	test_SM_Manager();
 	return 0;
 }
