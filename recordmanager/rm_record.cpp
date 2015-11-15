@@ -1,5 +1,5 @@
 #include "RecordManager.h"
-#include "../utils/MyBitMap.h"
+//#include "../utils/MyBitMap.h"
 
 #include <cstdio>
 #include <cstring>

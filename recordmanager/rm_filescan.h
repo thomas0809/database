@@ -78,6 +78,7 @@ class RM_FileScan {
 			case LE_OP: return strcmp(v1, v2) <= 0;;
 			case GE_OP: return strcmp(v1, v2) >= 0;
 			case NE_OP: return strcmp(v1, v2) != 0;
+			case NO_OP: return true;
 			default: break;
 		}
 		return false;
@@ -172,7 +173,8 @@ public:
     		if(findRecord(b)){
 //				cout << "ha" << endl;
     			RID rid(currentPage, currentRecord);
-    			char* pdata = (char*)(b + 24 + (currentRecord * recordSize) / 4);
+    			//char* pdata = (char*)(b + 24 + (currentRecord * recordSize) / 4);
+    			char* pdata = (char*)b + 96 + currentRecord * recordSize;
     			rec.Set(pdata, recordSize, rid);
     			return currentRecord++;
     		}

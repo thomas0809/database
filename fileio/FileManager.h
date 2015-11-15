@@ -120,13 +120,12 @@ public:
 		_openFile(name, fileID);
 		return true;
 	}
-
 	bool destroyFile(const char* filename){
-	    int error = remove(filename);
-	    if (error == 0)
-	    	return true;
-	    else
-	    	return false;
+		int error = remove(filename);
+		if (error == 0)
+		    return true;
+		else
+		    return false;
 	}
 	int newType() {
 		int t = tm->findLeftOne();

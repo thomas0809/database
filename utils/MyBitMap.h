@@ -17,12 +17,14 @@ using namespace std;
 #define BIAS 5
 //unsigned char h[61];
 
+
 class MyBitMap {
 protected:
 //	static const int LEAF_BIT = 32;
 //	static const int MAX_LEVEL = 5;
 //	static const int MAX_INNER_NUM = 10;
 //	static const int MOD = 61;
+//	static unsigned char h[MOD];
 	static unsigned char h[];
 	static uint getMask(int k) {
 		uint s = 0;
