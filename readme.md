@@ -97,8 +97,15 @@ RM Interface:
 	
 	
 
-系统管理模块：(钱神剩下的靠你了)
-	在main.cpp中test_SM_Manager为系统管理模块的测试函数，这一部分还有以下几点需要完善
-	1.需要解析指令，在test_SM_Manager函数中直接实现了Create DataBase dbName, Use DataBase dbName, Drop DataBase dbName
-		注意在我这个例子中use指令没有切换目录（因为没有必要），实际上在其他情况下需要切换目录
-	2.需要实现“NOT NULL”和“PRIMARY KEY”这两个关键字，这两个关键字我还没想好怎么存
+系统管理模块
+
+	SM_Manager : int CreateDb(const char *)
+	             int OpenDb(const char *)
+	             int CloseDb()
+	             int DropDb(const char *)
+	             int ShowDb(const char *)
+	             int CreateTable(const char *tableName, int attrCount, AttrInfo *attrs)
+	             int DropTable(const char *tableName)
+	             int Exec(const char *instruction)
+
+	测试代码 : main.cpp / test_SM_Manager()
