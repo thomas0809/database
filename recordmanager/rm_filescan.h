@@ -3,26 +3,12 @@
 
 #include "../fileio/FileManager.h"
 #include "../utils/pagedef.h"
+#include "../common/common.h"
 #include "RecordManager.h"
 #include "PageHead.h"
 #include <cstring>
 #include <iostream>
 
-enum AttrType {
-    MyINT,
-    FLOAT,
-    STRING
-};
-
-enum Compop {
-	EQ_OP,
-	LT_OP,
-	GT_OP,
-	LE_OP,
-	GE_OP,
-	NE_OP,
-	NO_OP
-};
 
 enum ClientHint {
     NO_HINT
@@ -38,7 +24,7 @@ class RM_FileScan {
 	AttrType attrType;
 	int attrLength;
 	int attrOffset;
-	Compop compOp;
+	CompOp compOp;
 	void* value;
 
 	int currentPage;
@@ -137,7 +123,7 @@ public:
                 AttrType attrType,
                 int attrLength,
                 int attrOffset,
-                Compop compOp,
+                CompOp compOp,
                 void *value,
                 ClientHint pinHint = NO_HINT){
     	int index;

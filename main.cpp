@@ -6,12 +6,15 @@
  */
 #include "bufmanager/BufPageManager.h"
 #include "fileio/FileManager.h"
-//#include "utils/pagedef.h"
+#include "common/common.h"
 #include "recordmanager/RecordManager.h"
 #include "recordmanager/rm_filescan.h"
 #include "systemmanager/sm_manager.h"
+#include "indexmanager/IX_Manager.h"
 #include <iostream>
-//#include <direct.h>
+#include <cstdlib>
+#include <algorithm>
+using namespace std;
 
 #define MAXNAME 11
 
@@ -95,7 +98,7 @@ void test_RM_FileScan()
 
     void* value = (void*)&a;
     AttrType attrType = STRING;
-    Compop compOp = EQ_OP;
+    CompOp compOp = EQ_OP;
     int flag = scan->OpenScan(file, attrType, 24, 8, compOp, value);
     
     int loc = scan->GetNextRec(rec);
@@ -229,10 +232,52 @@ void test_SM_Manager(){
 	return;
 }
 
+void test_IX_Manager()
+{
+	FileManager* fm = new FileManager();
+	BufPageManager* bpm = new BufPageManager(fm);
+	IX_Manager *ixm = new IX_Manager(fm, bpm);
+	ixm->CreateIndex("qyj", 0, MyINT, 4);
+	IX_IndexHandle ixhandle;
+	ixm->OpenIndex("qyj", 0, ixhandle);
+	int a[100005];
+	printf("insert begin.\n");
+	for (int i = 0; i < 100; i++)
+	{
+		printf("%d\n", i);
+		a[i] = rand();
+		ixhandle.InsertEntry(&a[i], RID(0, i));
+	}
+	printf("insert finished.\n");
+	ixhandle.PrintEntries();
+	for (int i = 0; i < 50; i++)
+	{
+		printf("%d\n", i);
+		ixhandle.DeleteEntry(&a[i], RID(0, i));
+		//printf("\n");
+	}
+	ixhandle.PrintEntries();
+	//sort(a + 50, a + 100);
+	for (int i = 50; i < 100; i++)
+		printf("%d ", a[i]);
+	printf("\n");
+	ixhandle.ForcePages();
+	IX_IndexScan scan;
+	int value = 500782188;
+	scan.OpenScan(ixhandle, NE_OP, &value);
+	RID rid;
+	while (scan.GetNextEntry(rid) != -1)
+		printf("%d ", a[rid.Slot()]);
+	printf("\n");
+
+}
+
 int main() {
+	setbuf(stdout,NULL);
     //test_RM_Manager();
     //test_RM_FileScan();
     //test_RM_FileHandle();
-	test_SM_Manager();
+	//test_SM_Manager();
+	test_IX_Manager();
 	return 0;
 }
