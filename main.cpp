@@ -6,13 +6,16 @@
  */
 #include "bufmanager/BufPageManager.h"
 #include "fileio/FileManager.h"
-//#include "utils/pagedef.h"
+#include "common/common.h"
 #include "recordmanager/RecordManager.h"
 #include "recordmanager/rm_filescan.h"
 #include "systemmanager/sm_manager.h"
+#include "indexmanager/IX_Manager.h"
 #include <iostream>
-//#include "qlmanager/ql_manager.h"
-//#include <direct.h>
+
+#include <cstdlib>
+#include <algorithm>
+using namespace std;
 
 using namespace std;
 
@@ -94,7 +97,7 @@ void test_RM_FileScan()
 
     void* value = (void*)&a;
     AttrType attrType = STRING;
-    Compop compOp = EQ_OP;
+    CompOp compOp = EQ_OP;
     int flag = scan->OpenScan(file, attrType, 24, 8, compOp, value);
     
     int loc = scan->GetNextRec(rec);
@@ -232,77 +235,52 @@ void test_SM_Manager(){
 	return;
 }
 
-
-void test_QL_Manager(){
-//	char command[80] = "./create ";
-//	char command1[80] = "rm -r ";
-/*	char command[80] = "create ";
-	char command1[80] = "rmdir ";
-	char dbname[10] = "1";
-	int whetherDel = 0;
+void test_IX_Manager()
+{
 	FileManager* fm = new FileManager();
 	BufPageManager* bpm = new BufPageManager(fm);
-	RM_Manager* rm_m = new RM_Manager(fm, bpm);
-	SM_Manager* sm_m = new SM_Manager(*rm_m);
-	QL_Manager* ql_m = new QL_Manager(*sm_m, *rm_m);
-	char pathbuf[100];
-	//create File
-	sm_m->CreateDb(dbname);
-	getcwd(pathbuf, 100);
-	cout << pathbuf << endl;
-	sm_m->OpenDb("1");
-	cout << "yes" << endl;
-	getcwd(pathbuf, 100);
-	cout << pathbuf << endl;	
-	//加入三个属性
-	AttrInfo x[3];
-	string str = "lalala";
-	memcpy(x[0].attrName, str.c_str(), str.length());
-	x[0].attrType = MyINT;
-	x[0].attrLength = 4;
-	string str1 = "hahaha";
-	memcpy(x[1].attrName, str1.c_str(), str1.length());
-	x[1].attrType = MyINT;
-	x[1].attrLength = 4;
-	string str2 = "kakaka";
-	memcpy(x[2].attrName, str2.c_str(), str2.length());
-	x[2].attrType = MyINT;
-	x[2].attrLength = 4;
-	sm_m->CreateTable("a", 2, x);
-	sm_m->CloseDb();
-	cout << "test ql" << endl;
-	//插入
-	sm_m->Exec("CREATE DATABASE qyj");
-	sm_m->Exec("DROP DATABASE qyj");
-	sm_m->Exec("CREATE DATABASE qyj");
-	sm_m->Exec("USE DATABASE qyj");
-	sm_m->Exec("CREATE TABLE example(name char(10), age int, score float NOT NULL)");
-	sm_m->Exec("CREATE TABLE example2(id int, gender, int)");
-	sm_m->Exec("SHOW DATABASE qyj");
-	sm_m->Exec("SHOW TABLE example");
-	int nValues = 3;
-	Value* value = new Value[nValues];
-	value[0].attrType = MyINT;
-	value[0].attrLength = 4;
-	int testValue_0 = 1;
-	value[0].data = (void*)testValue_0;
-	value[1].attrType = MyINT;
-	value[1].attrLength = 4;
-	int testValue_1 = 2;
-	value[1].data = (void*)testValue_1;
-	value[2].attrType = MyINT;
-	value[2].attrLength = 4;
-	int testValue_2 = 3;
-	value[2].data = (void*)testValue_2;
-	cout << "start insert" << endl;
-	ql_m->Insert(dbname, nValues, value);*/
+	IX_Manager *ixm = new IX_Manager(fm, bpm);
+	ixm->CreateIndex("qyj", 0, MyINT, 4);
+	IX_IndexHandle ixhandle;
+	ixm->OpenIndex("qyj", 0, ixhandle);
+	int a[100005];
+	printf("insert begin.\n");
+	for (int i = 0; i < 100; i++)
+	{
+		printf("%d\n", i);
+		a[i] = rand();
+		ixhandle.InsertEntry(&a[i], RID(0, i));
+	}
+	printf("insert finished.\n");
+	ixhandle.PrintEntries();
+	for (int i = 0; i < 50; i++)
+	{
+		printf("%d\n", i);
+		ixhandle.DeleteEntry(&a[i], RID(0, i));
+		//printf("\n");
+	}
+	ixhandle.PrintEntries();
+	//sort(a + 50, a + 100);
+	for (int i = 50; i < 100; i++)
+		printf("%d ", a[i]);
+	printf("\n");
+	ixhandle.ForcePages();
+	IX_IndexScan scan;
+	int value = 500782188;
+	scan.OpenScan(ixhandle, NE_OP, &value);
+	RID rid;
+	while (scan.GetNextEntry(rid) != -1)
+		printf("%d ", a[rid.Slot()]);
+	printf("\n");
+
 }
 
 int main() {
+	setbuf(stdout,NULL);
     //test_RM_Manager();
     //test_RM_FileScan();
     //test_RM_FileHandle();
-	test_SM_Manager();
-	//test_QL_Manager();
+	//test_SM_Manager();
+	test_IX_Manager();
 	return 0;
 }

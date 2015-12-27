@@ -3,28 +3,11 @@
 
 #include "../fileio/FileManager.h"
 #include "../utils/pagedef.h"
+#include "../common/common.h"
 #include "RecordManager.h"
 #include "PageHead.h"
 #include <cstring>
 #include <iostream>
-
-enum AttrType {
-    MyINT,
-    FLOAT,
-    STRING
-};
-
-enum CompOp {
-    EQ_OP,
-    LT_OP,
-    GT_OP,
-    LE_OP,
-    GE_OP,
-    NE_OP,
-    LIKE_OP,
-    NULL_OP,
-    NO_OP
-};
 
 enum ClientHint {
     NO_HINT
