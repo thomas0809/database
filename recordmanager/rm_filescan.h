@@ -14,14 +14,16 @@ enum AttrType {
     STRING
 };
 
-enum Compop {
-	EQ_OP,
-	LT_OP,
-	GT_OP,
-	LE_OP,
-	GE_OP,
-	NE_OP,
-	NO_OP
+enum CompOp {
+    EQ_OP,
+    LT_OP,
+    GT_OP,
+    LE_OP,
+    GE_OP,
+    NE_OP,
+    LIKE_OP,
+    NULL_OP,
+    NO_OP
 };
 
 enum ClientHint {
@@ -38,7 +40,7 @@ class RM_FileScan {
 	AttrType attrType;
 	int attrLength;
 	int attrOffset;
-	Compop compOp;
+	CompOp compOp;
 	void* value;
 
 	int currentPage;
@@ -75,7 +77,7 @@ class RM_FileScan {
 			case EQ_OP: return strcmp(v1, v2) == 0;
 			case LT_OP: return strcmp(v1, v2) < 0;
 			case GT_OP: return strcmp(v1, v2) > 0;
-			case LE_OP: return strcmp(v1, v2) <= 0;;
+			case LE_OP: return strcmp(v1, v2) <= 0;
 			case GE_OP: return strcmp(v1, v2) >= 0;
 			case NE_OP: return strcmp(v1, v2) != 0;
 			case NO_OP: return true;
@@ -94,31 +96,44 @@ class RM_FileScan {
 					return true;
 
 				if(attrType == MyINT){
-					int offset = (96 + currentRecord * recordSize + attrOffset) / 4;
-					int v1 = b[offset];
+					int offset = (96 + currentRecord * recordSize + attrOffset);
+					int v1 = *((int*)((char*)b + offset));
 					int v2 = *((int*)value);
 					if(condINT(v1, v2)) return true;
 				}
 				if(attrType == FLOAT){
-					int offset = (96 + currentRecord * recordSize + attrOffset) / 4;
-					float *v = (float*)b;
-					float v1 = v[offset];
+					int offset = (96 + currentRecord * recordSize + attrOffset);
+					float *v = (float*)((char*)b+offset);
+					float v1 = *v;
 					float v2 = *((float*)value);
 					if(condFLOAT(v1, v2)) return true;
 				}
 				if(attrType == STRING){
+//					cout << "start check" << endl;
 					char* v1 = new char[attrLength + 1];
 					char* v2 = new char[attrLength + 1];
-					int offset = (96 + currentRecord * recordSize + attrOffset) / 4;
-					memcpy(v1, b + offset, attrLength);
+					memset(v1, 0, attrLength + 1);
+					memset(v2, 0, attrLength + 1);
+					int offset = (96 + currentRecord * recordSize + attrOffset);
+//					cout << "offset" << offset << "attrLength"<< attrLength << "attrOffset" << attrOffset << endl;
+//					for (int i = 0; i < 100; i++)
+//						cout << b[i] << ' ';
+//					cout << endl;
+					memcpy(v1, (char*)b + offset, attrLength);
 					memcpy(v2, value, attrLength);
 					v1[attrLength] = '\0';
 //					char* v2 = (char*)value;
 //					cout << "he" << endl;
 					v2[attrLength] = '\0';
 //					cout << "he" << endl;
-//					cout << v1 << ' ' << v2 << endl;
-					if(CondSTRING(v1, v2)) return true;
+//					cout << "String compare: " << v1 << ' ' << v2 << endl;
+//					for (int i = 0; i < attrLength; i++)
+//						cout << v1[i] << v2[i] << ' ';
+//					cout << endl;
+					if(CondSTRING(v1, v2)){
+//						cout << "is equal" << endl; 
+						return true;
+					}
 				}
 			}
 		}
@@ -137,7 +152,7 @@ public:
                 AttrType attrType,
                 int attrLength,
                 int attrOffset,
-                Compop compOp,
+                CompOp compOp,
                 void *value,
                 ClientHint pinHint = NO_HINT){
     	int index;
@@ -158,7 +173,9 @@ public:
     	currentRecord = 0;
     	if(attrType < MyINT || attrType > STRING || compOp < EQ_OP || compOp > NO_OP) 
     		return 0;
-    	if((attrType == MyINT && attrLength != 4) || (attrType == FLOAT && attrLength != 4) || (attrType == STRING && attrLength < 0))
+//    	if((attrType == MyINT && attrLength != 4) || (attrType == FLOAT && attrLength != 4) || (attrType == STRING && attrLength < 0))
+//    		return 0;
+    	if((attrType == STRING && attrLength < 0))
     		return 0;
     	if((attrOffset + attrLength) > recordSize)
     		return 0;
@@ -169,9 +186,9 @@ public:
     	for(; currentPage <= pageNumber; currentPage++){
     		int index;
     		BufType b = bpm->getPage(fileID, currentPage, index);
-//			cout << "hi" << endl;
+//		cout << "hi" << currentPage << ' ' << currentRecord << endl;
     		if(findRecord(b)){
-//				cout << "ha" << endl;
+//		cout << "hi" << currentPage << ' ' << currentRecord << endl;
     			RID rid(currentPage, currentRecord);
     			//char* pdata = (char*)(b + 24 + (currentRecord * recordSize) / 4);
     			char* pdata = (char*)b + 96 + currentRecord * recordSize;

@@ -68,6 +68,8 @@ int RM_FileHandle::InsertRec(const char *pData, RID &rid)
 		int pageid = (++fileHead->pageNumber);
 		bpm->markDirty(headindex);
 		BufType b = bpm->allocPage(fileID, pageid, pageindex, false);
+		memset(b, 0, 8 * 1024);
+//		BufType b = bpm->getPage(fileID, pageid, pageindex);
 		PageHead head = PageHead();
 		head.usedSlot++;
 		head.setRecordHead(0, true);

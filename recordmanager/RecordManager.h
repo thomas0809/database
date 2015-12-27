@@ -35,6 +35,14 @@ public:
 	int Slot() const          // Return slot number
 	{ return slot; }
 
+	void Copy(RID _rid){
+	  int Page = 0;
+	  int Slot = 0;
+          _rid.GetPageNum(Page);
+	  _rid.GetSlotNum(Slot);
+	  this->page = Page;
+	  this->slot = Slot;
+	}
 	bool operator==(const RID & rhs) const
 	{
 		int p;
@@ -186,7 +194,9 @@ public:
     	myFileManager->createFile(fileName);
     	myFileManager->openFile(fileName, fileID);
 		cout << "log: fileID " <<fileID << endl;
-    	BufType b = bpm->allocPage(fileID, pageID, index, false);
+		BufType b = bpm->allocPage(fileID, pageID, index, false);
+		memset(b, 0, 8 * 1024);
+//		BufType b = bpm->getPage(fileID, pageID, index);
     	bpm->markDirty(index);
     	cout << "log: recordSize " << recordSize <<endl;
 

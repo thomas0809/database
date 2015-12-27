@@ -1,0 +1,1 @@
+UPDATE book SET pub_id='81764' WHERE title='asf';

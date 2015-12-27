@@ -1,5 +1,7 @@
 #include <iostream>
 //#include <direct.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include "../recordmanager/RecordManager.h"
 
 int main (int argc, char **argv )

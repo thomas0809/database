@@ -23,21 +23,27 @@ int RM_Record::Set(char *pData, int size, RID rid_)
 	if(recordSize != -1 && (size != recordSize))
 		return 0;
 	recordSize = size;
-  	this->rid = rid_;
-	if (data == NULL)
+  	this->rid.Copy(rid_);
+	if (data == NULL){
 		data = new char[recordSize];
+		memset(data, 0, sizeof(data));
+	}
   	memcpy(data, pData, size);
 	return 1;
 }
 
 int RM_Record::GetData(char *&pData) const 
 {
+//	while(1){
+//	}
 	if (data != NULL && recordSize != -1)
   	{
+//		cout << "print data" << endl;
+//		strncpy(pData, data, recordSize);
 		pData = data;
 		return 1;
 	}
-	else 
+	else			 
 		return 0;
 }
 
@@ -45,8 +51,8 @@ int RM_Record::GetRid(RID &rid) const
 {
 	if (data != NULL && recordSize != -1)
 	{
-    	rid = this->rid;
-    	return 1;
+    		rid.Copy(this->rid);
+    		return 1;
   	}
 	else 
 		return 0;

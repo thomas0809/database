@@ -23,7 +23,10 @@ public:
 	 */
 	BufType* addr;
 	BufType allocMem() {
-		return new unsigned int[(PAGE_SIZE >> 2)];
+//		BufType b = new unsigned int[(PAGE_SIZE) >> 2];
+//		memset(b, 0, (PAGE_SIZE) >> 4);
+//		return b;
+		return new unsigned int[(PAGE_SIZE) >> 2];
 	}
 	BufType fetchPage(int typeID, int pageID, int& index) {
 		BufType b;
