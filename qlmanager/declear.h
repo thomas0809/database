@@ -11,11 +11,8 @@
 #include "../recordmanager/rm_filescan.h"
 #include "../systemmanager/sm_manager.h"
 #include "../recordmanager/RecordManager.h"
-<<<<<<< HEAD
 #include "../common/common.h"
-=======
 #include "../indexmanager/IX_Manager.h"
->>>>>>> 9a608b328983947511e1e8c263a5ab5a48e7b6b6
 
 using namespace std;
 
@@ -474,15 +471,6 @@ class QL_Manager {
 //	    	cout << "debug: 3" << endl;
 		buf[size + label[i]] = 1;
 	    }
-			
-<<<<<<< HEAD
-//	    cout << "debug: 4" << endl;
-	    attrfh.InsertRec(buf, rid);
-//	    cout << "Insert Correctly, Rid: " << rid.Page() << ' ' << rid.Slot() << endl;
-	    rmm->CloseFile(attrfh);
-	    delete []buf;
-	    delete []dataInfo;
-=======
 //			cout << "debug: 4" << endl;
 			attrfh.InsertRec(buf, rid);
 
@@ -501,7 +489,6 @@ class QL_Manager {
 			rmm->CloseFile(attrfh);
 			delete []buf;
 			delete []dataInfo;
->>>>>>> 9a608b328983947511e1e8c263a5ab5a48e7b6b6
             cout << "END INSERT" << endl;
         }
 
@@ -570,18 +557,7 @@ class QL_Manager {
 	    	cout << "Attribute not in Relation!" << endl;
 		return;
 	    }
-<<<<<<< HEAD
-	    cout << "attrType: " << attrType << endl;
-	    cout << "attrLength: " << attrLength << endl;
-	    cout << "attrOffset: " << attrOffset << endl;	 
-	    cout << "attrIndexNo: " << attrIndexNo << endl;   
-            returnCode = 0;
-            rmm->OpenFile(relName, attrfh);
-//	    for (int i = 0; i < 10; i++)
-//		cout << *(char*)(cond->rhsValue.data+ i) << ' ';
-//	    cout << endl;
-	    returnCode = rfs.OpenScan(attrfh, attrType, attrLength, attrOffset, cond->op, cond->rhsValue.data, attrIndexNo);
-=======
+
 	    //cout << "attrType: " << attrType << endl;
 	    //cout << "attrLength: " << attrLength << endl;
 	    //cout << "attrOffset: " << attrOffset << endl;
@@ -614,7 +590,6 @@ class QL_Manager {
 		    cout << *((char*)(cond->rhsValue.data)+ i) << ' ';
 	    cout << endl;
 	    returnCode = rfs.OpenScan(attrfh, attrType, attrLength, attrOffset, cond->op, cond->rhsValue.data);
->>>>>>> 9a608b328983947511e1e8c263a5ab5a48e7b6b6
 	    cout << returnCode << endl;
 	    RM_Record rec_1;
 	    while (returnCode == 1) {
@@ -749,8 +724,8 @@ class QL_Manager {
 		RM_Record tempRec;
 		cout << rid[i] << endl;
                 attrfh.GetRec(rid[i], tempRec);
-		void *temp;
-		temp = tempRec.data;
+		char *temp;
+		temp = (char*)tempRec.data;
 		
 //		for (int i = 0; i < strlen(temp); i++)
 //			cout << temp[i];
