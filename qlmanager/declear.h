@@ -6,6 +6,7 @@
 #include "../recordmanager/rm_filescan.h"
 #include "../systemmanager/sm_manager.h"
 #include "../recordmanager/RecordManager.h"
+#include "../indexmanager/IX_Manager.h"
 
 using namespace std;
 
@@ -45,14 +46,6 @@ using namespace std;
        // primaryKey = false;
    // }
 // };
-
-enum AggeType {
-    NONE,
-    SUM,
-    AVG,
-    MIN,
-    MAX
-};
 
 struct RelAttr {
     AggeType type;
@@ -138,7 +131,7 @@ struct Condition {
 class QL_Manager {
     public:
                                               // Constructor
-		QL_Manager (SM_Manager *_smm, RM_Manager *_rmm):smm(_smm), rmm(_rmm){}
+		QL_Manager (SM_Manager *_smm, RM_Manager *_rmm, IX_Manager *_ixm):smm(_smm), rmm(_rmm), ixm(_ixm){}
         //QL_Manager (SM_Manager &smm, IX_Manager &ixm, RM_Manager &rmm);
         ~QL_Manager ();                         // Destructor
         
@@ -196,7 +189,7 @@ class QL_Manager {
 		RM_Record tempRec;
 		cout << rid[i] << endl;
                 attrfh.GetRec(rid[i], tempRec);
-		void *temp;
+	    char *temp;
 		temp = tempRec.data;
 //		for (int i = 0; i < strlen(temp); i++)
 //			cout << temp[i];
@@ -331,6 +324,7 @@ class QL_Manager {
         }
 
         void Search(const char* relName, const Condition* cond, int& nrid, RID*& rid) {//need two RM_Record, rid = newRID[500000];
+
             cout << "QL Search Function" << endl;
             cout << relName << endl;
             cout << (cond->lhsAttr.relName == NULL) << ' ' << cond->lhsAttr.attrName << endl;
@@ -346,16 +340,16 @@ class QL_Manager {
             nrid = 0;
             rid = new RID[500000];
             //check bRhsIsAttr, if bRhsIsAttr == true ,exit
-            if (cond->bRhsIsAttr){
-		cout << "Error:  WHERE ? op value" << endl;
-		return;
+            if (cond->bRhsIsAttr) {
+		        cout << "Error:  WHERE ? op value" << endl;
+		        return;
             }
             RM_FileScan rfs = RM_FileScan(rmm->getFileManager(), rmm->getBufPageManager());
-	    RM_FileHandle attrfh;
-	    RM_Record rec;
-	    RID tempRid;
-	    int returnCode;
-	    AttrType attrType;
+	        RM_FileHandle attrfh;
+	        RM_Record rec;
+	        RID tempRid;
+	        int returnCode;
+	        AttrType attrType;
             int attrLength;
             int attrOffset;
             int inRel = -1;
@@ -392,24 +386,46 @@ class QL_Manager {
 	    	cout << "Attribute not in Relation!" << endl;
 		return;
 	    }
-	    cout << "attrType: " << attrType << endl;
-	    cout << "attrLength: " << attrLength << endl;
-	    cout << "attrOffset: " << attrOffset << endl;	    
+	    //cout << "attrType: " << attrType << endl;
+	    //cout << "attrLength: " << attrLength << endl;
+	    //cout << "attrOffset: " << attrOffset << endl;
+
+        char buf[100];
+        memset(buf, 0, sizeof buf);
+        sprintf(buf, "%s.%s.index", relName, cond->lhsAttr.attrName);
+        if (access(buf, 0) != -1) {
+            IX_IndexHandle ixh;
+            ixm->OpenIndex(relName, cond->lhsAttr.attrName, ixh);
+            IX_IndexScan ixscan;
+            //printf("%s\n", cond->rhsValue.data);
+            ixscan.OpenScan(ixh, cond->op, cond->rhsValue.data);
+            RID tmprid;
+            nrid = 0;
+            while (ixscan.GetNextEntry(tmprid) != -1) {
+                rid[nrid] = tmprid;
+                nrid += 1;
+            }
+            //ixh.PrintEntries();
+            ixm->CloseIndex(ixh);
+            printf("search from index, %d\n", nrid);
+            return;
+        }
+
 
             returnCode = 0;
-            rmm->OpenFile(relName, attrfh);
+        rmm->OpenFile(relName, attrfh);
 	    for (int i = 0; i < 10; i++)
-		cout << *(char*)(cond->rhsValue.data+ i) << ' ';
+		    cout << *((char*)(cond->rhsValue.data)+ i) << ' ';
 	    cout << endl;
 	    returnCode = rfs.OpenScan(attrfh, attrType, attrLength, attrOffset, cond->op, cond->rhsValue.data);
 	    cout << returnCode << endl;
 	    RM_Record rec_1;
-	    while (returnCode == 1){
+	    while (returnCode == 1) {
 //		cout << "ret : 1" << endl;
-		x = rfs.GetNextRec(rec_1);
+		    x = rfs.GetNextRec(rec_1);
 //		cout << "ret : 2" << endl;
-		if (x == -1)
-			break;
+		    if (x == -1)
+			    break;
 //		cout << x << endl;
 //		char* t = new char[100];
 //		char* temp = NULL;
@@ -423,10 +439,10 @@ class QL_Manager {
 //			cout << t[i];
 //		cout << t << endl;
 //		delete []t;
-		rec_1.GetRid(tempRid);
-		rid[nrid].Copy(tempRid);
-		cout << rid[nrid] << endl;
-		nrid++;
+		    rec_1.GetRid(tempRid);
+		    rid[nrid].Copy(tempRid);
+		    cout << rid[nrid] << endl;
+		    nrid++;
 //		cout << "get Rid: " << tempRid << endl;
 	    }
 	    rfs.CloseScan();
@@ -476,6 +492,7 @@ class QL_Manager {
 private:
 	SM_Manager *smm;
 	RM_Manager *rmm;
+    IX_Manager *ixm;
 };
 
 #endif

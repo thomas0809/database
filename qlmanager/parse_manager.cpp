@@ -291,7 +291,7 @@ void Parse_Manager::readInsertData(char* relName, int nattr, AttrInfo* attrs){
 		if(nvalue != nattr) cout << "Syntax Error" << endl;
 
 		for (int j = 0; j < nvalue; j++){
-			fscanf(fp, "%d ", &values[j].type);
+			fscanf(fp, "%d", &values[j].type);
 
 			if (values[j].type == MyINT){
 				readInt(values[j].data);
@@ -308,13 +308,13 @@ void Parse_Manager::readInsertData(char* relName, int nattr, AttrInfo* attrs){
 }
 
 
-void Parse_Manager::MainLoop(SM_Manager *smm, RM_Manager *rmm) {
+void Parse_Manager::MainLoop(SM_Manager *smm, RM_Manager *rmm, IX_Manager *ixm) {
 
 	string instruction = string("python parser.py ") + filename + string("> tmp");
 	system(instruction.c_str());
 
 	fp = fopen("tmp.gen", "r");
-	ql_manager = new QL_Manager(smm, rmm);
+	ql_manager = new QL_Manager(smm, rmm, ixm);
 
 	char cmd[256];
 	int a = 1;
@@ -391,12 +391,39 @@ void Parse_Manager::MainLoop(SM_Manager *smm, RM_Manager *rmm) {
 			char *relName = readName();
 			char *attrName = readName();
 			cout << relName << ' ' << attrName << endl;
+			int attrNum;
+			DataAttrInfo* attrs;
+			smm->GetTable(relName, attrNum, attrs);
+			for (int i = 0; i < attrNum; i++)
+				if (strcmp(attrs[i].attrName, attrName) == 0) {
+					//printf("createindex attrName : %s  attrLength : %d  attroffset : %d\n", attrs[i].attrName, attrs[i].attrLength, attrs[i].offset);
+					ixm->CreateIndex(relName, attrName, attrs[i].attrType, attrs[i].attrLength);
+					IX_IndexHandle ixh;
+					ixm->OpenIndex(relName, attrName, ixh);
+					RM_FileHandle relfh;
+					rmm->OpenFile(relName, relfh);
+					RM_FileScan scan(rmm->getFileManager(), rmm->getBufPageManager());
+					scan.OpenScan(relfh, attrs[i].attrType, attrs[i].attrLength, 0, NO_OP, (void*)0);
+					int cnt = 0;
+					while (true) {
+						RM_Record rec;
+						if (scan.GetNextRec(rec) == -1)
+							break;
+						ixh.InsertEntry(rec.data + attrs[i].offset, rec.rid);
+						//printf("%d %s  %lld\n", cnt++, rec.data + attrs[i].offset, (long long)(rec.data));
+					}
+					//printf("\n");
+					rmm->CloseFile(relfh);
+					ixm->CloseIndex(ixh);
+					break;
+				}
 		}
 
 		else if(strcmp(cmd, "dropindex") == 0) { //DROP INDEX customer(name);
 			char *relName = readName();
 			char *attrName = readName();
 			cout << relName << ' ' << attrName << endl;
+			ixm->DestroyIndex(relName, attrName);
 		}
 
 		else if(strcmp(cmd, "insert") == 0){

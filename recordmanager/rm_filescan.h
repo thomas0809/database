@@ -37,6 +37,7 @@ class RM_FileScan {
 			case LE_OP: return v1 <= v2;
 			case GE_OP: return v1 >= v2;
 			case NE_OP: return v1 != v2;
+			case NO_OP: return true;
 			default: break;
 		}
 		return false;
@@ -50,6 +51,7 @@ class RM_FileScan {
 			case LE_OP: return v1 <= v2;
 			case GE_OP: return v1 >= v2;
 			case NE_OP: return v1 != v2;
+			case NO_OP: return true;
 			default: break;
 		}
 		return false;
