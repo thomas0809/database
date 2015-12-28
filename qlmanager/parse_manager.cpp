@@ -60,6 +60,27 @@ void Parse_Manager::readRelAttr(RelAttr& relattr) {
 	}
 	else
 		relattr.relName = NULL;
+	int loc = -1;
+	for(int i = 0; i < strlen(relattr.attrName); i++) {
+		if(relattr.attrName[i] == '_') {
+			loc = i;
+			break;
+		}
+	}
+	if(loc != -1) {
+		relattr.outkeyrel = new char[MAXNAME];
+		memset(relattr.outkeyrel, 0, MAXNAME);
+		relattr.outkeyattr = new char[MAXNAME];
+		memset(relattr.outkeyattr, 0, MAXNAME);
+		memcpy(relattr.outkeyrel, relattr.attrName, loc - 1);
+		memcpy(relattr.outkeyattr, relattr.attrName + loc + 1, strlen(relattr.attrName) - loc);
+
+	}
+	else{
+		relattr.outkeyrel = NULL;
+		relattr.outkeyattr = NULL;
+	}
+
 	delete rel;
 }
 
@@ -291,7 +312,7 @@ void Parse_Manager::readInsertData(char* relName, int nattr, AttrInfo* attrs){
 		if(nvalue != nattr) cout << "Syntax Error" << endl;
 
 		for (int j = 0; j < nvalue; j++){
-			fscanf(fp, "%d ", &values[j].type);
+			fscanf(fp, "%d", &values[j].type);
 
 			if (values[j].type == MyINT){
 				readInt(values[j].data);
@@ -321,7 +342,7 @@ void Parse_Manager::MainLoop(SM_Manager *smm, RM_Manager *rmm) {
 	while(true) {
 		a = 0;
 		memset(cmd, 0 , 256);
-		fscanf(fp, "%s", cmd);
+		fscanf(fp, "%s\n", cmd);
 		cout << "cmd: " << cmd << endl;
 		if (strcmp(cmd, "Syntax error") == 0)
 			cout << "Syntax error" << endl;
@@ -371,6 +392,31 @@ void Parse_Manager::MainLoop(SM_Manager *smm, RM_Manager *rmm) {
 			cout << relName << endl;
 			char* pk = readName();
 			cout << pk << endl;
+			char *temp = readName();
+			if(strcmp(temp, "check") == 0){
+				char *check_attr = readName();
+				int ntype;
+				fscanf(fp, "%d", &ntype);
+				cout << check_attr << ' ' << ntype << endl;
+				Value* value = new Value[ntype];
+				for(int i = 0; i < ntype; i++) {
+					fscanf(fp, "%d", &value[i].type);
+					if (value[i].type == MyINT){
+						readInt(value[i].data);
+					}
+					else if(value[i].type == FLOAT){
+						readFloat(value[i].data);
+					}
+					else{
+						readString(value[i].data);
+					}
+
+					cout << value[i];
+				}
+			}
+			else if(strcmp(temp, "nocheck") == 0) {
+				cout << "nocheck" << endl;
+			}
 			int attrCount;
 			AttrInfo* attributes;
 			fscanf(fp, "%d", &attrCount);
@@ -505,7 +551,9 @@ void Parse_Manager::MainLoop(SM_Manager *smm, RM_Manager *rmm) {
 					int ncond = 0;
 					Condition* cond;
 					readWhere(ncond, cond);
-					ql_manager->Select(nattrs, attr, nrela, rela, 0, ncond, cond, attr[0]);
+RelAttr gattr;
+ql_manager->Select(0,NULL,0,NULL,0,0,NULL,gattr);
+					//ql_manager->Select(nattrs, attr, nrela, rela, 0, ncond, cond, attr[0]);
 				}
 			}
 			else if(strcmp(temp, "group") == 0) {

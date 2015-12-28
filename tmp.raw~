@@ -1,0 +1,1 @@
+SELECT order.id, book.id FROM order,book WHERE book.id < 200200 AND order.id < 200100; 

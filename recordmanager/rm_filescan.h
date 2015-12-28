@@ -28,6 +28,8 @@ class RM_FileScan {
 
 	int currentPage;
 	int currentRecord;
+	
+	int indexNo;
 
 	bool condINT(int v1, int v2){
 		switch(compOp) {
@@ -75,9 +77,25 @@ class RM_FileScan {
 		for(; currentRecord < totalRecord; currentRecord++){
 			bool isRecord = pagehead->getRecordHead(currentRecord);
 			if(isRecord){
-				if(value == NULL)
+				// NULL return false
+				//cout << "compOp: " << compOp << endl;
+				//if (compOp == 7)
+				//	cout << "hahaha " << indexNo << ' ' << recordSize << endl;
+				int offset_1 = 96 + currentRecord * recordSize + indexNo;
+				char v3 = *((char*)b + offset_1);
+				//cout << v3 << endl;
+				if (v3 == 0 && indexNo != -1){
+				//	cout << "========!!=====(- -)======!!===" << endl;
+					if (compOp == 7)
+						return true;
+					continue;
+				}
+				if(value == NULL){
+					if (compOp == 7){
+						continue;
+					}
 					return true;
-
+				}
 				if(attrType == MyINT){
 					int offset = (96 + currentRecord * recordSize + attrOffset);
 					int v1 = *((int*)((char*)b + offset));
@@ -137,9 +155,11 @@ public:
                 int attrOffset,
                 CompOp compOp,
                 void *value,
+		int indexNo = -1,
                 ClientHint pinHint = NO_HINT){
     	int index;
 		this->fileID = fileHandle.getFileID();
+		this->indexNo = indexNo;
 //		cout << "in OpenScan " << fileID << endl;
 		if (bpm == NULL)
 			cout << "in RM_FileScan buffermannager is NULL" <<endl;
@@ -154,6 +174,10 @@ public:
     	this->value = value;
     	currentPage = 1;
     	currentRecord = 0;
+//	cout << "========================" << endl;
+//	cout << this->compOp << compOp <<  endl;
+	if (this->compOp == 7)
+		return 1;
     	if(attrType < MyINT || attrType > STRING || compOp < EQ_OP || compOp > NO_OP) 
     		return 0;
 //    	if((attrType == MyINT && attrLength != 4) || (attrType == FLOAT && attrLength != 4) || (attrType == STRING && attrLength < 0))

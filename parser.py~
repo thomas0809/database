@@ -393,11 +393,11 @@ for sql in sqllist:
 		for item in cols:
 			m1 = re.compile(r'(AVG|SUM|MIN|MAX)\((.+)\)').match(item.strip())
 			if m1:
-				f1.write(getagge(m1.group(1)) + getAttr(m1.group(2).strip()) + "\n")
+				f1.write(getagge(m1.group(1)) + getAttr(m1.group(2)) + "\n")
 				print m1.group(1), m1.group(2)
 			else:
 				print item
-				f1.write(getagge("NONE") + getAttr(item.strip()) + "\n")
+				f1.write(getagge("NONE") + getAttr(item) + "\n")
 
 		m1 = re.compile(r'(.+)WHERE[\s]+(.+)').match(m.group(2))
 		if m1:
