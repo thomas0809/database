@@ -10,12 +10,12 @@ CREATE DATABASE qby
 9
 USE qby
 11
-CREATE TABLE book(id int(10),name varchar(50),author varchar(200), day int(5),month int(5),year int(5))
+CREATE TABLE book(id int(10),name varchar(50),author varchar(200), day int(5),month int(5),year int(5), CHECK(year in (2530, 1680, 2154, 2809, 1166, 1578)), PRIMARY KEY(id))
 3
 cmd create table
 ('Table name ', 'book')
-('Primary key ', 'null')
-year int(5)
+('Primary key ', 'id')
+CHECK(year in (2530, 1680, 2154, 2809, 1166, 1578))
 ('Col name ', 'id')
 ('Col type ', 'int')
 ('Col leng ', '10')
@@ -80,6 +80,16 @@ SELECT id,name FROM book WHERE name='Behind the Blue and Gray'
 cmd select
 id
 name
+('Table name ', 'book')
+SELECT id,name FROM book WHERE author='Robert Asprin'
+7
+cmd select
+id
+name
+('Table name ', 'book')
+UPDATE book SET name='Nine Times Nine' WHERE author='Robert Asprin'
+6
+cmd update
 ('Table name ', 'book')
 SELECT id,name FROM book WHERE author='Robert Asprin'
 7

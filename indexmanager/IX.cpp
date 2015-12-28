@@ -12,6 +12,9 @@ int IX_Manager::CreateIndex(const char *fileName, const char *indexName, AttrTyp
 	char buf[100];
 	memset(buf, 0, sizeof buf);
 	sprintf(buf, "%s.%s.index", fileName, indexName);
+	if (access(buf, 0) != -1) {
+		return -1;
+	}
 	pfm->createFile(buf);
 	pfm->openFile(buf, fileID);
 

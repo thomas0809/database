@@ -12,8 +12,15 @@ use
 qby
 createtable
 book
-null
-nocheck
+id
+check year
+6
+0 2530
+0 1680
+0 2154
+0 2809
+0 1166
+0 1578
 6
 id 0 10 0
 name 2 50 0
@@ -6791,6 +6798,23 @@ book
 where
 1
 4 null name 0 2 Behind the Blue and Gray
+5
+select
+2
+0 null id 
+0 null name 
+1
+book
+where
+1
+4 null author 0 2 Robert Asprin
+5
+update
+book
+null name 2 Nine Times Nine
+where
+1
+4 null author 0 2 Robert Asprin
 5
 select
 2

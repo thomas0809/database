@@ -4,7 +4,8 @@ CREATE DATABASE qby;
 DROP DATABASE qby;
 CREATE DATABASE qby;
 USE qby;
-CREATE TABLE book(id int(10),name varchar(50),author varchar(200), day int(5),month int(5),year int(5));
+CREATE TABLE book(id int(10),name varchar(50),author varchar(200), day int(5),month int(5),year int(5), 
+CHECK(year in (2530, 1680, 2154, 2809, 1166, 1578)), PRIMARY KEY(id));
 SHOW TABLES;
 SHOW book;
 CREATE INDEX book(name);
@@ -975,4 +976,5 @@ DELETE FROM book WHERE year=1688;
 SELECT id,name FROM book WHERE name='Boca do inferno: Romance';
 SELECT id,name FROM book WHERE name='Behind the Blue and Gray';
 SELECT id,name FROM book WHERE author='Robert Asprin';
-
+UPDATE book SET name='Nine Times Nine' WHERE author='Robert Asprin';
+SELECT id,name FROM book WHERE author='Robert Asprin';

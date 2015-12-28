@@ -398,21 +398,38 @@ void Parse_Manager::MainLoop(SM_Manager *smm, RM_Manager *rmm, IX_Manager *ixm) 
 				int ntype;
 				fscanf(fp, "%d", &ntype);
 				cout << check_attr << ' ' << ntype << endl;
+				AttrType attrType;
+				int attrLength;
 				Value* value = new Value[ntype];
 				for(int i = 0; i < ntype; i++) {
 					fscanf(fp, "%d", &value[i].type);
 					if (value[i].type == MyINT){
 						readInt(value[i].data);
+						attrType = MyINT;
+						attrLength = 4;
 					}
 					else if(value[i].type == FLOAT){
 						readFloat(value[i].data);
+						attrType = FLOAT;
+						attrLength = 4;
 					}
 					else{
 						readString(value[i].data);
+						attrType = STRING;
+						attrLength = 1024;
 					}
-
 					cout << value[i];
 				}
+				char checkname[512];
+				memset(checkname, 0, sizeof checkname);
+				sprintf(checkname, "%s.check", check_attr);
+				ixm->CreateIndex(relName, checkname, attrType, attrLength);
+				IX_IndexHandle ixh;
+				ixm->OpenIndex(relName, checkname, ixh);
+				for (int i = 0; i < ntype; i++) {
+					ixh.InsertEntry(value[i].data, RID(i, 0));
+				}
+				ixm->CloseIndex(ixh);
 			}
 			else if(strcmp(temp, "nocheck") == 0) {
 				cout << "nocheck" << endl;
@@ -424,7 +441,10 @@ void Parse_Manager::MainLoop(SM_Manager *smm, RM_Manager *rmm, IX_Manager *ixm) 
 			for (int i = 0; i < attrCount; i++){
 				memset(attributes[i].attrName, 0, MAXNAME+1);
 				fscanf(fp, "%s %d %d %d", attributes[i].attrName, &attributes[i].attrType, &attributes[i].attrLength, &attributes[i].notNull);
-				if(strcmp(attributes[i].attrName, pk) == 0) attributes[i].primaryKey = 1;
+				if(strcmp(attributes[i].attrName, pk) == 0) {
+					attributes[i].primaryKey = 1;
+					ixm->CreateIndex(relName, attributes[i].attrName, attributes[i].attrType, attributes[i].attrLength);
+				}
 			}
 			AttrInfo *x = new AttrInfo[attrCount];
 			for (int i = 0; i < attrCount; i++)
@@ -443,7 +463,8 @@ void Parse_Manager::MainLoop(SM_Manager *smm, RM_Manager *rmm, IX_Manager *ixm) 
 			for (int i = 0; i < attrNum; i++)
 				if (strcmp(attrs[i].attrName, attrName) == 0) {
 					//printf("createindex attrName : %s  attrLength : %d  attroffset : %d\n", attrs[i].attrName, attrs[i].attrLength, attrs[i].offset);
-					ixm->CreateIndex(relName, attrName, attrs[i].attrType, attrs[i].attrLength);
+					if (ixm->CreateIndex(relName, attrName, attrs[i].attrType, attrs[i].attrLength) == -1)
+						break;
 					IX_IndexHandle ixh;
 					ixm->OpenIndex(relName, attrName, ixh);
 					RM_FileHandle relfh;
