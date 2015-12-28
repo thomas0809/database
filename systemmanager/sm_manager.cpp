@@ -46,7 +46,8 @@ SM_Manager::~SM_Manager(){
 }
 
 int SM_Manager::CreateDb (const char *dbName){
-	char command[80] = "./create ";
+//	char command[80] = "./create ";
+	char command[80] = "mkdir ";
 //	char command[80] = "create ";
 	system(strcat(command, dbName));
 	chdir(dbName);

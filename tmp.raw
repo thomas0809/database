@@ -28,4 +28,3 @@ SELECT id, name, author FROM book WHERE id = 200003;
 UPDATE book SET author = 'Carlo DEste' WHERE id > 200002;
 SELECT id, name, author FROM book WHERE id = 200003;
 SELECT id, name, author FROM book WHERE day < 100;
-SELECT order.id, book.id FROM order,book WHERE book.id < 200200 AND order.id < 200100; 

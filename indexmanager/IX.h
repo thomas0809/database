@@ -9,6 +9,10 @@
 #define INDEXMANAGER_IX_H_
 
 
+#include "../fileio/FileManager.h"
+#include "../bufmanager/BufPageManager.h"
+#include "../common/common.h"
+
 struct IX_FileHead
 {
 	AttrType attrType;

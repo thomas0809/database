@@ -11,7 +11,11 @@
 #include "../recordmanager/rm_filescan.h"
 #include "../systemmanager/sm_manager.h"
 #include "../recordmanager/RecordManager.h"
+<<<<<<< HEAD
 #include "../common/common.h"
+=======
+#include "../indexmanager/IX_Manager.h"
+>>>>>>> 9a608b328983947511e1e8c263a5ab5a48e7b6b6
 
 using namespace std;
 
@@ -39,14 +43,6 @@ using namespace std;
        // primaryKey = false;
    // }
 // };
-
-enum AggeType {
-    NONE,
-    SUM,
-    AVG,
-    MIN,
-    MAX
-};
 
 struct RelAttr {
     AggeType type;
@@ -134,7 +130,7 @@ struct Condition {
 class QL_Manager {
     public:
                                               // Constructor
-		QL_Manager (SM_Manager *_smm, RM_Manager *_rmm):smm(_smm), rmm(_rmm){}
+		QL_Manager (SM_Manager *_smm, RM_Manager *_rmm, IX_Manager *_ixm):smm(_smm), rmm(_rmm), ixm(_ixm){}
         //QL_Manager (SM_Manager &smm, IX_Manager &ixm, RM_Manager &rmm);
         ~QL_Manager ();                         // Destructor
         
@@ -215,7 +211,7 @@ class QL_Manager {
 		RM_Record tempRec;
 		cout << rid[i] << endl;
                 attrfh.GetRec(rid[i], tempRec);
-		void *temp;
+	    char *temp;
 		temp = tempRec.data;
 //		for (int i = 0; i < strlen(temp); i++)
 //			cout << temp[i];
@@ -479,16 +475,38 @@ class QL_Manager {
 		buf[size + label[i]] = 1;
 	    }
 			
+<<<<<<< HEAD
 //	    cout << "debug: 4" << endl;
 	    attrfh.InsertRec(buf, rid);
 //	    cout << "Insert Correctly, Rid: " << rid.Page() << ' ' << rid.Slot() << endl;
 	    rmm->CloseFile(attrfh);
 	    delete []buf;
 	    delete []dataInfo;
+=======
+//			cout << "debug: 4" << endl;
+			attrfh.InsertRec(buf, rid);
+
+            for(int i = 0; i < nValues; i++) {
+                char indexname[100];
+                memset(indexname, 0, sizeof indexname);
+                sprintf(indexname, "%s.%s.index", relName, dataInfo[i].attrName);
+                if (access(indexname, 0) != -1) {
+                    IX_IndexHandle ixh;
+                    ixm->OpenIndex(relName, dataInfo[i].attrName, ixh);
+                    ixh.InsertEntry(values[i].data, rid);
+                    ixm->CloseIndex(ixh);
+                }
+            }
+//			cout << "Insert Correctly, Rid: " << rid.Page() << ' ' << rid.Slot() << endl;
+			rmm->CloseFile(attrfh);
+			delete []buf;
+			delete []dataInfo;
+>>>>>>> 9a608b328983947511e1e8c263a5ab5a48e7b6b6
             cout << "END INSERT" << endl;
         }
 
         void Search(const char* relName, const Condition* cond, int& nrid, RID*& rid) {//need two RM_Record, rid = newRID[500000];
+
             cout << "QL Search Function" << endl;
             cout << relName << endl;
             cout << (cond->lhsAttr.relName == NULL) << ' ' << cond->lhsAttr.attrName << endl;
@@ -504,16 +522,16 @@ class QL_Manager {
             nrid = 0;
             rid = new RID[MAXRID];
             //check bRhsIsAttr, if bRhsIsAttr == true ,exit
-            if (cond->bRhsIsAttr){
-		cout << "Error:  WHERE ? op value" << endl;
-		return;
+            if (cond->bRhsIsAttr) {
+		        cout << "Error:  WHERE ? op value" << endl;
+		        return;
             }
             RM_FileScan rfs = RM_FileScan(rmm->getFileManager(), rmm->getBufPageManager());
-	    RM_FileHandle attrfh;
-	    RM_Record rec;
-	    RID tempRid;
-	    int returnCode;
-	    AttrType attrType;
+	        RM_FileHandle attrfh;
+	        RM_Record rec;
+	        RID tempRid;
+	        int returnCode;
+	        AttrType attrType;
             int attrLength;
             int attrOffset;
 	    int attrIndexNo;
@@ -552,6 +570,7 @@ class QL_Manager {
 	    	cout << "Attribute not in Relation!" << endl;
 		return;
 	    }
+<<<<<<< HEAD
 	    cout << "attrType: " << attrType << endl;
 	    cout << "attrLength: " << attrLength << endl;
 	    cout << "attrOffset: " << attrOffset << endl;	 
@@ -562,14 +581,48 @@ class QL_Manager {
 //		cout << *(char*)(cond->rhsValue.data+ i) << ' ';
 //	    cout << endl;
 	    returnCode = rfs.OpenScan(attrfh, attrType, attrLength, attrOffset, cond->op, cond->rhsValue.data, attrIndexNo);
+=======
+	    //cout << "attrType: " << attrType << endl;
+	    //cout << "attrLength: " << attrLength << endl;
+	    //cout << "attrOffset: " << attrOffset << endl;
+
+        char buf[100];
+        memset(buf, 0, sizeof buf);
+        sprintf(buf, "%s.%s.index", relName, cond->lhsAttr.attrName);
+        if (access(buf, 0) != -1) {
+            IX_IndexHandle ixh;
+            ixm->OpenIndex(relName, cond->lhsAttr.attrName, ixh);
+            IX_IndexScan ixscan;
+            //printf("%s\n", cond->rhsValue.data);
+            ixscan.OpenScan(ixh, cond->op, cond->rhsValue.data);
+            RID tmprid;
+            nrid = 0;
+            while (ixscan.GetNextEntry(tmprid) != -1) {
+                rid[nrid] = tmprid;
+                nrid += 1;
+            }
+            //ixh.PrintEntries();
+            ixm->CloseIndex(ixh);
+            printf("search from index, %d\n", nrid);
+            return;
+        }
+
+
+            returnCode = 0;
+        rmm->OpenFile(relName, attrfh);
+	    for (int i = 0; i < 10; i++)
+		    cout << *((char*)(cond->rhsValue.data)+ i) << ' ';
+	    cout << endl;
+	    returnCode = rfs.OpenScan(attrfh, attrType, attrLength, attrOffset, cond->op, cond->rhsValue.data);
+>>>>>>> 9a608b328983947511e1e8c263a5ab5a48e7b6b6
 	    cout << returnCode << endl;
 	    RM_Record rec_1;
-	    while (returnCode == 1){
+	    while (returnCode == 1) {
 //		cout << "ret : 1" << endl;
-		x = rfs.GetNextRec(rec_1);
+		    x = rfs.GetNextRec(rec_1);
 //		cout << "ret : 2" << endl;
-		if (x == -1)
-			break;
+		    if (x == -1)
+			    break;
 //		cout << x << endl;
 //		char* t = new char[100];
 //		char* temp = NULL;
@@ -583,10 +636,10 @@ class QL_Manager {
 //			cout << t[i];
 //		cout << t << endl;
 //		delete []t;
-		rec_1.GetRid(tempRid);
-		rid[nrid].Copy(tempRid);
-		cout << rid[nrid] << endl;
-		nrid++;
+		    rec_1.GetRid(tempRid);
+		    rid[nrid].Copy(tempRid);
+		    cout << rid[nrid] << endl;
+		    nrid++;
 //		cout << "get Rid: " << tempRid << endl;
 	    }
 	    rfs.CloseScan();
@@ -604,9 +657,29 @@ class QL_Manager {
  	    RM_FileScan rfs = RM_FileScan(rmm->getFileManager(), rmm->getBufPageManager());
 	    RM_Record rec;
             RM_FileHandle attrfh;
+            int countAttr = 0;
+            DataAttrInfo* dataInfo = NULL;
+            smm->GetTable(relName, countAttr, dataInfo);
+
             rmm->OpenFile(relName,attrfh);
+        for (int j = 0; j < countAttr; j++) {
+            char indexname[100];
+            memset(indexname, 0, sizeof indexname);
+            sprintf(indexname, "%s.%s.index", relName, dataInfo[j].attrName);
+            if (access(indexname, 0) != -1) {
+                IX_IndexHandle ixh;
+                ixm->OpenIndex(relName, dataInfo[j].attrName, ixh);
+                for (int i = 0; i < nrid; i++) {
+                    RM_Record rec;
+                    attrfh.GetRec(rid[i], rec);
+                    char *data = rec.data + dataInfo[j].offset;
+                    ixh.DeleteEntry(data, rid[i]);
+                }
+                ixm->CloseIndex(ixh);
+            }
+        }
 	    for (int i = 0; i < nrid; i++){
-	    	attrfh.DeleteRec(rid[i]);
+            attrfh.DeleteRec(rid[i]);
 	    }
 	    rmm->CloseFile(attrfh);
             cout << "END DELETE" << endl << endl;
@@ -754,6 +827,7 @@ class QL_Manager {
 private:
 	SM_Manager *smm;
 	RM_Manager *rmm;
+    IX_Manager *ixm;
 };
 
 #endif

@@ -13,7 +13,7 @@ class Parse_Manager {
 
 public:
 	Parse_Manager(string filename_) : filename(filename_) {}
-	void MainLoop(SM_Manager *smm, RM_Manager *rmm);
+	void MainLoop(SM_Manager *smm, RM_Manager *rmm, IX_Manager *ixm);
 	char* readName();
 	void readAttr(int& nattr, AttrInfo*& attrs);
 	void readInsertData(char* relName, int nattr, AttrInfo* attrs);
