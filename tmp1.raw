@@ -7,6 +7,7 @@ USE qby;
 CREATE TABLE book(id int(10),name varchar(50),author varchar(200), day int(5),month int(5),year int(5));
 SHOW TABLES;
 SHOW book;
+CREATE INDEX book(name);
 INSERT INTO book VALUES 
  (200001,'Marias Diary (Plus S.)','Mark P. O. Morford',100082,5991,2530),
  (200002,'Standing in the Shadows','Richard Bruce Wright',101787,2900,1860),
@@ -967,7 +968,11 @@ INSERT INTO book VALUES
  (200958,'The Well : Davids Story','Georg Feverstein',100902,657,2595),
  (200959,'Behind the Blue and Gray','Nomi Eve',101687,1093,1578),
  (200960,'Does Your Computer Byte?','Bruce Catton',104521,180,1429);
-CREATE INDEX book(name);
 CREATE INDEX book(id);
 SELECT id,name FROM book WHERE id<=200017;
 SELECT id,name FROM book WHERE name='Boca do inferno: Romance';
+DELETE FROM book WHERE year=1688;
+SELECT id,name FROM book WHERE name='Boca do inferno: Romance';
+SELECT id,name FROM book WHERE name='Behind the Blue and Gray';
+SELECT id,name FROM book WHERE author='Robert Asprin';
+

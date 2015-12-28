@@ -23,6 +23,9 @@ year 0 5 0
 showtables
 showtable
 book
+createindex
+book
+name
 insert
 book 0
 959
@@ -6741,9 +6744,6 @@ book 0
 0 1429
 createindex
 book
-name
-createindex
-book
 id
 select
 2
@@ -6764,4 +6764,40 @@ book
 where
 1
 4 null name 0 2 Boca do inferno: Romance
+5
+delete
+book
+where
+1
+4 null year 0 0 1688
+5
+select
+2
+0 null id 
+0 null name 
+1
+book
+where
+1
+4 null name 0 2 Boca do inferno: Romance
+5
+select
+2
+0 null id 
+0 null name 
+1
+book
+where
+1
+4 null name 0 2 Behind the Blue and Gray
+5
+select
+2
+0 null id 
+0 null name 
+1
+book
+where
+1
+4 null author 0 2 Robert Asprin
 5

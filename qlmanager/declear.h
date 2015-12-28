@@ -316,6 +316,18 @@ class QL_Manager {
 			
 //			cout << "debug: 4" << endl;
 			attrfh.InsertRec(buf, rid);
+
+            for(int i = 0; i < nValues; i++) {
+                char indexname[100];
+                memset(indexname, 0, sizeof indexname);
+                sprintf(indexname, "%s.%s.index", relName, dataInfo[i].attrName);
+                if (access(indexname, 0) != -1) {
+                    IX_IndexHandle ixh;
+                    ixm->OpenIndex(relName, dataInfo[i].attrName, ixh);
+                    ixh.InsertEntry(values[i].data, rid);
+                    ixm->CloseIndex(ixh);
+                }
+            }
 //			cout << "Insert Correctly, Rid: " << rid.Page() << ' ' << rid.Slot() << endl;
 			rmm->CloseFile(attrfh);
 			delete []buf;
@@ -460,9 +472,29 @@ class QL_Manager {
  	    RM_FileScan rfs = RM_FileScan(rmm->getFileManager(), rmm->getBufPageManager());
 	    RM_Record rec;
             RM_FileHandle attrfh;
+            int countAttr = 0;
+            DataAttrInfo* dataInfo = NULL;
+            smm->GetTable(relName, countAttr, dataInfo);
+
             rmm->OpenFile(relName,attrfh);
+        for (int j = 0; j < countAttr; j++) {
+            char indexname[100];
+            memset(indexname, 0, sizeof indexname);
+            sprintf(indexname, "%s.%s.index", relName, dataInfo[j].attrName);
+            if (access(indexname, 0) != -1) {
+                IX_IndexHandle ixh;
+                ixm->OpenIndex(relName, dataInfo[j].attrName, ixh);
+                for (int i = 0; i < nrid; i++) {
+                    RM_Record rec;
+                    attrfh.GetRec(rid[i], rec);
+                    char *data = rec.data + dataInfo[j].offset;
+                    ixh.DeleteEntry(data, rid[i]);
+                }
+                ixm->CloseIndex(ixh);
+            }
+        }
 	    for (int i = 0; i < nrid; i++){
-	    	attrfh.DeleteRec(rid[i]);
+            attrfh.DeleteRec(rid[i]);
 	    }
 	    rmm->CloseFile(attrfh);
             cout << "END DELETE" << endl << endl;
