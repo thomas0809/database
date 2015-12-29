@@ -596,7 +596,7 @@ class QL_Manager {
 			    RM_Record tempRec;
 			    rmm->OpenFile(right[i].relName,attrfh);
                		    attrfh.GetRec(rid[rightRel[i]][index[rightRel[i]]], tempRec);
-		       	    void *temp;
+		       	    char *temp;
 			    temp = tempRec.data;
 			    char* buf = new char[MAXATTRLENGTH];
 			    memset(buf, 0, MAXATTRLENGTH);
@@ -672,7 +672,7 @@ class QL_Manager {
 			RM_Record tempRec;
 			rmm->OpenFile(left[i].relName, attrfh);
 			attrfh.GetRec(rid[leftRel[i]][index[leftRel[i]]], tempRec);
-		       	void *temp;
+		       	char *temp;
 			temp = tempRec.data;
 			char* buf = new char[MAXATTRLENGTH];
 			memset(buf, 0, MAXATTRLENGTH);
@@ -742,7 +742,7 @@ class QL_Manager {
 			rmm->OpenFile(getAttr[i].relName, attrfh);
 			RM_Record tempRec;
                 	attrfh.GetRec(rid[attrOrder[i]][index[attrOrder[i]]], tempRec);
-			void *temp;
+			char *temp;
 			temp = tempRec.data;
 			cout << getAttr[i].relName << "->" << getAttr[i].attrName << ": ";
 			char* buf = new char[MAXATTRLENGTH];
@@ -829,13 +829,13 @@ class QL_Manager {
                    const Value values[],            // values to insert
                    int         nattr,               //
                    const AttrInfo attr[]){
-	    RM_FileHandle attrfh;
-	    RID rid;
-	    int countAttr = 0;
-	    DataAttrInfo* dataInfo = NULL;
-	    int size = 0;
-	    int offset = 0;
-	    int inSet[countAttr];
+	        RM_FileHandle attrfh;
+	        RID rid;
+	        int countAttr = 0;
+	        DataAttrInfo* dataInfo = NULL;
+	        int size = 0;
+	        int offset = 0;
+	        int inSet[countAttr];
             int label[nValues];
  //           cout << "=============QL Insert Function==============" << endl;
  //           cout << "RELNAME : " << relName << endl;
@@ -897,8 +897,13 @@ class QL_Manager {
         cout << endl;
         for (int i = 0; i < countAttr; i++)
         dataInfo[i].print();*/
+            bool primaryKey = true;
+
             for (int i = 0; i < countAttr; i++){
-                size += dataInfo[i].attrLength; 
+                size += dataInfo[i].attrLength;
+                if (dataInfo[i].primaryKey == true) {
+                    primaryKey = false;
+                } 
             }
 
             if (nattr != 0){
@@ -932,23 +937,21 @@ class QL_Manager {
             }
         //在relname中查找，重新获取长度
 //      cout << "debug: 2   size" << size << endl;
-            cout << "label" << ' ';
-            for (int i = 0; i < nValues; i++)
-                cout << label[i] << ' ';
-            cout << endl;
+            //cout << "label" << ' ';
+            //for (int i = 0; i < nValues; i++)
+             //   cout << label[i] << ' ';
+            //cout << endl;
         
             char *buf = new char[size + countAttr];
 //      cout << "debug: 3.1" << endl;
             memset(buf, 0, size + countAttr);
-
-            bool primaryKey = false;
 
             for(int i = 0; i < nValues; i++) {
                 if (label[i] <= -1)
                     continue;
 //          cout << "debug: 3.2" << endl;
                 int length = 0;
-                cout << label[i] <<"label[i]" << dataInfo[label[i]].attrName << ' ' << values[i] << endl;
+               // cout << label[i] <<"label[i]" << dataInfo[label[i]].attrName << ' ' << values[i] << endl;
                 memcpy(buf + dataInfo[label[i]].offset, values[i].data, values[i].getlength());
 //          cout << "length: " << values[i].getlength() << endl;
 //          cout << "debug: 3" << endl;
@@ -961,6 +964,7 @@ class QL_Manager {
                     ixscan.OpenScan(ixh, EQ_OP, values[i].data);
                     RID tmprid;
                     if (ixscan.GetNextEntry(tmprid) != -1) {
+                        printf("primary key already exist.\n");
                         ixm->CloseIndex(ixh);
                         return;
                     }
@@ -986,6 +990,7 @@ class QL_Manager {
             }
 //          cout << "debug: 4" << endl;
             if (!primaryKey) {
+                printf("no primary key.\n");
                 return;
             }
             rmm->OpenFile(relName, attrfh);
@@ -1079,30 +1084,27 @@ class QL_Manager {
         //cout << "attrLength: " << attrLength << endl;
         //cout << "attrOffset: " << attrOffset << endl;
 
-        char buf[100];
-        memset(buf, 0, sizeof buf);
-        sprintf(buf, "%s.%s.index", relName, cond->lhsAttr.attrName);
-	cout << "b" << endl;
-        if (access(buf, 0) != -1) {
-            IX_IndexHandle ixh;
-            ixm->OpenIndex(relName, cond->lhsAttr.attrName, ixh);
-            IX_IndexScan ixscan;
-            //printf("%s\n", cond->rhsValue.data);
-	    printf("openscan\n");
-            ixscan.OpenScan(ixh, cond->op, cond->rhsValue.data);
-	    printf("endopen\n");
-            RID tmprid;
-            nrid = 0;
-            while (ixscan.GetNextEntry(tmprid) != -1) {
-		printf("%d\n", nrid);
-                rid[nrid] = tmprid;
-                nrid += 1;
-		cout<<tmprid<<endl;
+        if (cond->op != NULL_OP) {
+            char buf[100];
+            memset(buf, 0, sizeof buf);
+            sprintf(buf, "%s.%s.index", relName, cond->lhsAttr.attrName);
+            if (access(buf, 0) != -1) {
+                IX_IndexHandle ixh;
+                ixm->OpenIndex(relName, cond->lhsAttr.attrName, ixh);
+                IX_IndexScan ixscan;
+                //printf("%s\n", cond->rhsValue.data);
+                ixscan.OpenScan(ixh, cond->op, cond->rhsValue.data);
+                RID tmprid;
+                nrid = 0;
+                while (ixscan.GetNextEntry(tmprid) != -1) {
+                    rid[nrid] = tmprid;
+                    nrid += 1;
+                }
+                //ixh.PrintEntries();
+                ixm->CloseIndex(ixh);
+                printf("search from index, %d\n", nrid);
+                return;
             }
-            //ixh.PrintEntries();
-            ixm->CloseIndex(ixh);
-            printf("search from index, %d\n", nrid);
-            return;
         }
 
         cout << "a" << endl;
@@ -1182,6 +1184,8 @@ class QL_Manager {
             cout << "END DELETE" << endl << endl;
 
         }
+
+
         void Update (const char *relName,            // relation to update
                    const RelAttr &updAttr,         // attribute to update
                    const int bIsValue,             // 0/1 if RHS of = is attribute/value
@@ -1290,6 +1294,30 @@ class QL_Manager {
                     break;
                 }
             }
+            if (updAttr.outkeyrel != NULL) {
+                printf("outkey not null %s\n", updAttr.outkeyrel);
+                if (indexed) {
+                    ixm->CloseIndex(ixh);
+                }
+                printf("!!outkey %s.%s\n", updAttr.outkeyrel, updAttr.outkeyattr);
+                IX_IndexHandle outixh;
+                printf("outkey %s.%s\n", updAttr.outkeyrel, updAttr.outkeyattr);
+                ixm->OpenIndex(updAttr.outkeyrel, updAttr.outkeyattr, outixh);
+                IX_IndexScan outscan;
+                outscan.OpenScan(outixh, EQ_OP, rbuf);
+                RID outrid;
+                if (outscan.GetNextEntry(outrid) == -1) {
+                    ixm->CloseIndex(outixh);
+                    rmm->CloseFile(attrfh);   
+                    printf("out key doesn't exist.\n");
+                    return;
+                }
+                printf("out key check passed.\n");
+                ixm->CloseIndex(outixh);
+                if (indexed) {
+                    ixm->OpenIndex(relName, lAttrInfo.attrName, ixh);
+                }
+            } 
 
             if (indexed) {
                 ixh.DeleteEntry(temp + lAttrInfo.offset, rid[i]);

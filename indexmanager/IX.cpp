@@ -679,11 +679,10 @@ int IX_IndexScan::GetNextEntry(RID &rid)
 {
 	while (true)
 	{
-		cout << "ixscan" << indexID << endl;
+		//cout << "ixscan" << indexID << endl;
 		if (ixhandle->GetRID(indexID, rid) == -1)
 			return -1;
 		char *k = ixhandle->GetKey(indexID);
-		//printf("%s\n", k);
 		int res = compareData(k);
 		if (myCompOp == EQ_OP && res != 0)
 			return -1;
