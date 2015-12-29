@@ -74,7 +74,7 @@ void Parse_Manager::readRelAttr(RelAttr& relattr) {
 		memset(relattr.outkeyrel, 0, MAXNAME);
 		relattr.outkeyattr = new char[MAXNAME];
 		memset(relattr.outkeyattr, 0, MAXNAME);
-		memcpy(relattr.outkeyrel, relattr.attrName, loc - 1);
+		memcpy(relattr.outkeyrel, relattr.attrName, loc);
 		memcpy(relattr.outkeyattr, relattr.attrName + loc + 1, strlen(relattr.attrName) - loc);
 
 	}

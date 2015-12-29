@@ -4,8 +4,7 @@ CREATE DATABASE qby;
 DROP DATABASE qby;
 CREATE DATABASE qby;
 USE qby;
-CREATE TABLE book(id int(10),name varchar(50),author varchar(200), day int(5),month int(5),year int(5), 
-CHECK(year in (2530, 1680, 2154, 2809, 1166, 1578)), PRIMARY KEY(id));
+CREATE TABLE book(id int(10),name varchar(50),author varchar(200), day int(5),month int(5),year int(5), PRIMARY KEY(id));
 SHOW TABLES;
 SHOW book;
 CREATE INDEX book(name);
@@ -971,6 +970,7 @@ INSERT INTO book VALUES
  (200960,'Does Your Computer Byte?','Bruce Catton',104521,180,1429);
 CREATE INDEX book(id);
 SELECT id,name FROM book WHERE id<=200017;
+SELECT id, name FROM book WHERE id=200955;
 SELECT id,name FROM book WHERE name='Boca do inferno: Romance';
 DELETE FROM book WHERE year=1688;
 SELECT id,name FROM book WHERE name='Boca do inferno: Romance';
@@ -978,3 +978,11 @@ SELECT id,name FROM book WHERE name='Behind the Blue and Gray';
 SELECT id,name FROM book WHERE author='Robert Asprin';
 UPDATE book SET name='Nine Times Nine' WHERE author='Robert Asprin';
 SELECT id,name FROM book WHERE author='Robert Asprin';
+CREATE TABLE order(id int(10),name varchar(50), book_id int(10));
+INSERT INTO order VALUES 
+(12345,'Marias Diary',200960);
+UPDATE order SET book_id=829478 WHERE name='Marias Diary';
+SELECT id, name, book_id FROM order WHERE name>'A';
+SELECT id, name FROM book WHERE id=200955;
+UPDATE order SET book_id=200955 WHERE name='Marias Diary';
+SELECT id, name, book_id FROM order WHERE name>'A';
