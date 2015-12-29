@@ -1,12 +1,4 @@
-CREATE DATABASE qby;
-DROP DATABASE qby;
-CREATE DATABASE qby;
-DROP DATABASE qby;
-CREATE DATABASE qby;
-USE qby;
-CREATE TABLE book(id int(10),name varchar(50),author varchar(200), day int(5),month int(5),year int(5));
-SHOW TABLES;
-SHOW book;
+USE orderDB;
 INSERT INTO book VALUES 
  (200001,'Marias Diary (Plus S.)','Mark P. O. Morford',100082,5991,2530),
  (200002,'Standing in the Shadows','Richard Bruce Wright',101787,2900,1860),
@@ -107,6 +99,7 @@ INSERT INTO book VALUES
  (200097,'Beneath a Midnight Moon','Robert G. Allen',104252,5814,1742),
  (200098,'Deadlines and Datelines','LOUIS DE BERNIERES',101756,8459,1592),
  (200099,'Gulac War (Sobs, No 6)','Pam Proctor',100546,9538,2544),
+ (200100,'Anyone Can Have a Happy',null,103343,3358,2213),
  (200101,'Cuba, larme secr??te','Irene Gonzalez Frei',100061,9269,1187),
  (200102,'La foire aux vanit??s','Michael Jan Friedman',103319,8836,1729),
  (200103,'La Terre sous ses pieds','Glendon Swarthout',101291,4391,2600),

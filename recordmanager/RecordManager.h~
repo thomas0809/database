@@ -10,61 +10,9 @@
 
 #include "../fileio/FileManager.h"
 #include "../bufmanager/BufPageManager.h"
-//#include "../utils/pagedef.h"
+#include "../common/common.h"
 #include <cstring>
 #include <iostream>
-
-//
-// RID: Record id interface
-//
-class RID {
-public:
-	static const int NULL_PAGE = -1;
-	static const int NULL_SLOT = -1;
-	RID() : page(NULL_PAGE), slot(NULL_SLOT) {}     // Default constructor
-	RID(int pageNum, int slotNum) : page(pageNum), slot(slotNum) {}
-	~RID(){}                                        // Destructor
-
-	int GetPageNum(int &pageNum) const          // Return page number
-	{ pageNum = page; return 0; }
-	int GetSlotNum(int &slotNum) const         // Return slot number
-	{ slotNum = slot; return 0; }
-
-	int Page() const          // Return page number
-	{ return page; }
-	int Slot() const          // Return slot number
-	{ return slot; }
-
-	void Copy(RID _rid){
-	  int Page = 0;
-	  int Slot = 0;
-          _rid.GetPageNum(Page);
-	  _rid.GetSlotNum(Slot);
-	  this->page = Page;
-	  this->slot = Slot;
-	}
-	bool operator==(const RID & rhs) const
-	{
-		int p;
-		int s;
-		rhs.GetPageNum(p);
-		rhs.GetSlotNum(s);
-		return (p == page && s == slot);
-	}
-
-private:
-	int page;
-	int slot;
-};
-
-inline ostream& operator <<(ostream & os, const RID& r)
-{
-	int p, s;
-	r.GetPageNum(p);
-	r.GetSlotNum(s);
-	os << "[" << p << "," << s << "]";
-	return os;
-}
 
 //
 // RM_Record: RM Record interface
@@ -195,6 +143,7 @@ public:
     	myFileManager->openFile(fileName, fileID);
 		cout << "log: fileID " <<fileID << endl;
 		BufType b = bpm->allocPage(fileID, pageID, index, false);
+		memset(b, 0, 8 * 1024);
 //		BufType b = bpm->getPage(fileID, pageID, index);
     	bpm->markDirty(index);
     	cout << "log: recordSize " << recordSize <<endl;
@@ -219,7 +168,7 @@ public:
     int OpenFile   (const char *fileName, RM_FileHandle &fileHandle){
     	int fileID;
     	myFileManager->openFile(fileName, fileID);
-		cout << fileName << ' ' << fileID << endl;
+//		cout << fileName << ' ' << fileID << endl;
     	fileHandle.Open(bpm, fileID);
         return 0;
     }

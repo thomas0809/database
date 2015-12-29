@@ -110,7 +110,7 @@ int SM_Manager::CreateTable (const char *relName,                // 创建表, 这里
 		myLog->LogDebug(dbName_not_right);
 		return FAIL;
 	}
-	cout << "aaaa" << endl;
+//	cout << "aaaa" << endl;
 	rmm.OpenFile("attrcat", attrfh);
 	int fileID = attrfh.getFileID();
 //	cout << "fileID " << fileID << endl;
@@ -118,11 +118,18 @@ int SM_Manager::CreateTable (const char *relName,                // 创建表, 这里
 	for (int i = 0; i < attrCount; i++)
 		d[i] = DataAttrInfo();
 	int size = 0;
+	int len = 0;
 	int returnCode = 0;
+	int ix = 0;
 	RID rid;
+	for (int i = 0; i < attrCount; i++){
+		len += attributes[i].attrLength;
+	}
 	for (int i = 0; i < attrCount; i++) {
 		d[i].setAttributes(attributes[i]);
 		d[i].offset = size;
+		d[i].indexNo = ix + len;
+		ix++;
 		size += attributes[i].attrLength;
 		strcpy (d[i].relName, relName);
 		returnCode = attrfh.InsertRec((char*) &d[i], rid);
@@ -131,10 +138,12 @@ int SM_Manager::CreateTable (const char *relName,                // 创建表, 这里
 	rmm.OpenFile("tablelist", tablefh);
 	TableInfo tbinfo;
 	strcpy(tbinfo.tableName, relName);
-	cout << "CreateTable: " << tbinfo.tableName << endl;
+//	cout << "CreateTable: " << tbinfo.tableName << endl;
 	tablefh.InsertRec((char*)&tbinfo, rid);
 	rmm.CloseFile(tablefh);
-	rmm.CreateFile(relName, size);
+//	rmm.CreateFile(relName, size);
+	//add null, every slot --> null or not null
+	rmm.CreateFile(relName, size + attrCount);
 /*	DataRelInfo rel;
 	strcpy(rel.relName, relName);
 	rel.relLength = size;
@@ -206,7 +215,7 @@ int SM_Manager::GetTable (const char *readRelName, int &number, DataAttrInfo* &d
 	RM_FileScan rfs = RM_FileScan(rmm.getFileManager(), rmm.getBufPageManager());	
  	RM_Record rec;
 	int returnCode;
-	cout << "GetTable" << endl;
+//	cout << "GetTable" << endl;
 	rmm.OpenFile("attrcat", attrfh);
 	returnCode = rfs.OpenScan(attrfh, STRING, strlen(readRelName), 16, EQ_OP, (void*)readRelName);
 	int x = 0;

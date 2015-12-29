@@ -168,7 +168,7 @@ public:
     int OpenFile   (const char *fileName, RM_FileHandle &fileHandle){
     	int fileID;
     	myFileManager->openFile(fileName, fileID);
-		cout << fileName << ' ' << fileID << endl;
+//		cout << fileName << ' ' << fileID << endl;
     	fileHandle.Open(bpm, fileID);
         return 0;
     }

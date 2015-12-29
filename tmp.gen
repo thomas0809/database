@@ -1,31 +1,8 @@
-createdatabase
-qby
-dropdatabase
-qby
-createdatabase
-qby
-dropdatabase
-qby
-createdatabase
-qby
 use
-qby
-createtable
-book
-null
-6
-id 0 10 0
-name 2 50 0
-author 2 200 0
-day 0 5 0
-month 0 5 0
-year 0 5 0
-showtables
-showtable
-book
+orderDB
 insert
 book 0
-959
+960
 6
 0 200001
 2 Marias Diary (Plus S.)
@@ -719,6 +696,13 @@ book 0
 0 100546
 0 9538
 0 2544
+6
+0 200100
+2 Anyone Can Have a Happy
+3 null null 
+0 103343
+0 3358
+0 2213
 6
 0 200101
 2 Cuba, larme secr??te

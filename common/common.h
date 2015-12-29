@@ -15,13 +15,15 @@ enum AttrType {
 };
 
 enum CompOp {
-	EQ_OP,
-	LT_OP,
-	GT_OP,
-	LE_OP,
-	GE_OP,
-	NE_OP,
-	NO_OP
+    EQ_OP,
+    LT_OP,
+    GT_OP,
+    LE_OP,
+    GE_OP,
+    NE_OP,
+    LIKE_OP,
+    NULL_OP,
+    NO_OP
 };
 
 //

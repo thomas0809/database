@@ -32,7 +32,7 @@ int RM_FileHandle::GetRec(const RID &rid, RM_Record &rec) const
 int RM_FileHandle::InsertRec(const char *pData, RID &rid)
 {
 	int headindex, pageindex;
-	cout << "InsertRec : " << pData << endl;
+//	cout << "InsertRec : " << pData << endl;
 	fileHead = (FileHead*)(bpm->getPage(fileID, 0, headindex));
 	bool ok = false;
 	for (int i = 1; i <= fileHead->pageNumber; i++)

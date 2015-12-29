@@ -161,7 +161,6 @@ f = open(filename)
 f1 = open("tmp.gen", "w")
 sqllist = f.read()
 sqllist = re.split(';\r\n|;\n', sqllist)
-print sqllist
 res = []
 res.append(re.compile(r'SHOW[\s]+TABLES[\s]*'))
 res.append(re.compile(r'DROP[\s]+TABLE[\s]+([\w]+)'))
@@ -186,7 +185,7 @@ for sql in sqllist:
 		continue
 	if sql[-1] == ';':
 		sql = sql[0:-1]
-
+	print sql
 	m = []
 	sqltype = -1
 	for i in range(len(res)):
@@ -212,9 +211,17 @@ for sql in sqllist:
 		f1.write("createtable\n")
 		f1.write(m.group(1) + "\n")
 		print("Table name ", m.group(1))
-		cols = m.group(2).split(',')
-		for i in range(len(cols)):
-			cols[i] = cols[i].strip()
+		temp = m.group(2).split(',')
+		cols = []
+		col = ''
+		for i in range(len(temp)):
+			col += temp[i]
+			if col.count('(') != col.count(')'):
+				col += ','
+				continue
+			cols.append(col.strip())
+			col = ''
+
 		m1 = re.compile(r'PRIMARY[\s]+KEY[\s]*\(([\w]+)\)').match(cols[-1])
 		cnt = len(cols)
 		if m1:
@@ -224,6 +231,18 @@ for sql in sqllist:
 		else:
 			print("Primary key ", "null")
 			f1.write("null\n")
+		print cols[cnt-1]
+		m1 = re.compile(r'CHECK[\s]*\([\s]*([\w]+)[\s]+in[\s]*\((.+)\)[\s]*\)').match(cols[cnt-1])
+		if m1:
+			f1.write("check " + m1.group(1) + '\n')
+			res2 = m1.group(2).split(',')
+			f1.write(str(len(res2)) + '\n')
+			for item in res2:
+				f1.write(getvalue(item.strip()))
+			cnt = cnt - 1
+		else:
+			f1.write("nocheck\n")
+
 		f1.write(str(cnt) + "\n")
 		for i in range(cnt):
 			if len(cols[i].split(' ')) == 2:
@@ -374,11 +393,11 @@ for sql in sqllist:
 		for item in cols:
 			m1 = re.compile(r'(AVG|SUM|MIN|MAX)\((.+)\)').match(item.strip())
 			if m1:
-				f1.write(getagge(m1.group(1)) + getAttr(m1.group(2)) + "\n")
+				f1.write(getagge(m1.group(1)) + getAttr(m1.group(2).strip()) + "\n")
 				print m1.group(1), m1.group(2)
 			else:
 				print item
-				f1.write(getagge("NONE") + getAttr(item) + "\n")
+				f1.write(getagge("NONE") + getAttr(item.strip()) + "\n")
 
 		m1 = re.compile(r'(.+)WHERE[\s]+(.+)').match(m.group(2))
 		if m1:

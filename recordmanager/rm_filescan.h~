@@ -3,28 +3,11 @@
 
 #include "../fileio/FileManager.h"
 #include "../utils/pagedef.h"
+#include "../common/common.h"
 #include "RecordManager.h"
 #include "PageHead.h"
 #include <cstring>
 #include <iostream>
-
-enum AttrType {
-    MyINT,
-    FLOAT,
-    STRING
-};
-
-enum CompOp {
-    EQ_OP,
-    LT_OP,
-    GT_OP,
-    LE_OP,
-    GE_OP,
-    NE_OP,
-    LIKE_OP,
-    NULL_OP,
-    NO_OP
-};
 
 enum ClientHint {
     NO_HINT
@@ -45,8 +28,10 @@ class RM_FileScan {
 
 	int currentPage;
 	int currentRecord;
+	
+	int indexNo;
 
-	bool condINT(int v1, int v2){
+public:	bool condINT(int v1, int v2){
 		switch(compOp) {
 			case EQ_OP: return v1 == v2;
 			case LT_OP: return v1 < v2;
@@ -92,9 +77,25 @@ class RM_FileScan {
 		for(; currentRecord < totalRecord; currentRecord++){
 			bool isRecord = pagehead->getRecordHead(currentRecord);
 			if(isRecord){
-				if(value == NULL)
+				// NULL return false
+				//cout << "compOp: " << compOp << endl;
+				//if (compOp == 7)
+				//	cout << "hahaha " << indexNo << ' ' << recordSize << endl;
+				int offset_1 = 96 + currentRecord * recordSize + indexNo;
+				char v3 = *((char*)b + offset_1);
+				//cout << v3 << endl;
+				if (v3 == 0 && indexNo != -1){
+				//	cout << "========!!=====(- -)======!!===" << endl;
+					if (compOp == 7)
+						return true;
+					continue;
+				}
+				if(value == NULL){
+					if (compOp == 7){
+						continue;
+					}
 					return true;
-
+				}
 				if(attrType == MyINT){
 					int offset = (96 + currentRecord * recordSize + attrOffset);
 					int v1 = *((int*)((char*)b + offset));
@@ -126,10 +127,13 @@ class RM_FileScan {
 //					cout << "he" << endl;
 					v2[attrLength] = '\0';
 //					cout << "he" << endl;
-					cout << "String compare: " << v1 << ' ' << v2 << endl;
-					for (int i = 0; i < attrLength; i++)
-						cout << v1[i] << v2[i] << ' ';
-					cout << endl;
+//					cout << "String compare: " << v1 << ' ' << v2 << endl;
+					void* t1 = (void *)v1;
+					void* t2 = (void *)v2;
+//					cout << *(int*)t1 << ' ' <<  *(int*)t2 << endl;
+//					for (int i = 0; i < attrLength; i++)
+//						cout << v1[i] << v2[i] << ' ';
+//					cout << endl;
 					if(CondSTRING(v1, v2)){
 						cout << "is equal" << endl; 
 						return true;
@@ -139,7 +143,7 @@ class RM_FileScan {
 		}
 		return false;
 	}
-public:
+
 	RM_FileScan(FileManager *pfm, BufPageManager* bpm){
 		myFileManager = pfm;
 		this->bpm = bpm;
@@ -154,9 +158,11 @@ public:
                 int attrOffset,
                 CompOp compOp,
                 void *value,
+		int indexNo = -1,
                 ClientHint pinHint = NO_HINT){
     	int index;
 		this->fileID = fileHandle.getFileID();
+		this->indexNo = indexNo;
 //		cout << "in OpenScan " << fileID << endl;
 		if (bpm == NULL)
 			cout << "in RM_FileScan buffermannager is NULL" <<endl;
@@ -171,6 +177,10 @@ public:
     	this->value = value;
     	currentPage = 1;
     	currentRecord = 0;
+//	cout << "========================" << endl;
+//	cout << this->compOp << compOp <<  endl;
+	if (this->compOp == 7)
+		return 1;
     	if(attrType < MyINT || attrType > STRING || compOp < EQ_OP || compOp > NO_OP) 
     		return 0;
 //    	if((attrType == MyINT && attrLength != 4) || (attrType == FLOAT && attrLength != 4) || (attrType == STRING && attrLength < 0))
