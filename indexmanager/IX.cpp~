@@ -479,7 +479,7 @@ int IX_IndexHandle::GetLowerBound(void *pData, RID &indexid)
 	if (filehead->root == -1)
 		return -1;
 	bpm->access(fhindex);
-	//printf("getlowerbound\n");
+	printf("getlowerbound\n");
 	indexid = searchDFS(filehead->root);
 	if (indexid.Page() == -1)
 		return -1;
@@ -683,7 +683,7 @@ int IX_IndexScan::GetNextEntry(RID &rid)
 		if (ixhandle->GetRID(indexID, rid) == -1)
 			return -1;
 		char *k = ixhandle->GetKey(indexID);
-		//printf("%s\n", k);
+		printf("%s\n", k);
 		int res = compareData(k);
 		if (myCompOp == EQ_OP && res != 0)
 			return -1;

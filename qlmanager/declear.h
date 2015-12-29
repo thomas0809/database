@@ -1082,17 +1082,22 @@ class QL_Manager {
         char buf[100];
         memset(buf, 0, sizeof buf);
         sprintf(buf, "%s.%s.index", relName, cond->lhsAttr.attrName);
+	cout << "b" << endl;
         if (access(buf, 0) != -1) {
             IX_IndexHandle ixh;
             ixm->OpenIndex(relName, cond->lhsAttr.attrName, ixh);
             IX_IndexScan ixscan;
             //printf("%s\n", cond->rhsValue.data);
+	    printf("openscan\n");
             ixscan.OpenScan(ixh, cond->op, cond->rhsValue.data);
+	    printf("endopen\n");
             RID tmprid;
             nrid = 0;
             while (ixscan.GetNextEntry(tmprid) != -1) {
+		printf("%d\n", nrid);
                 rid[nrid] = tmprid;
                 nrid += 1;
+		cout<<tmprid<<endl;
             }
             //ixh.PrintEntries();
             ixm->CloseIndex(ixh);
@@ -1100,7 +1105,7 @@ class QL_Manager {
             return;
         }
 
-
+        cout << "a" << endl;
             returnCode = 0;
         rmm->OpenFile(relName, attrfh);
         for (int i = 0; i < 10; i++)
