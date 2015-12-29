@@ -14,6 +14,14 @@ enum AttrType {
     STRING
 };
 
+enum AggeType {
+    NONE,
+    SUM,
+    AVG,
+    MIN,
+    MAX
+};
+
 enum CompOp {
     EQ_OP,
     LT_OP,

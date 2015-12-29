@@ -41,16 +41,37 @@ def getagge(string):
 	
 def getvalue(string):
 	if string[0] == '\'' and string[-1] == '\'':
+<<<<<<< HEAD
 		print("string", string[1:-1])
+=======
+<<<<<<< HEAD
+		print("string", string[1:-1])
+=======
+		#print("string", string[1:-1])
+>>>>>>> 9a608b328983947511e1e8c263a5ab5a48e7b6b6
+>>>>>>> 5fb5233fe7c02d410ae870c864bbca769ca21344
 		return "2 " + string[1:-1] + "\n"
 	else:
 		try:
 			val = str(eval(string))
 			if val.count('.') != 0:
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 5fb5233fe7c02d410ae870c864bbca769ca21344
 				print("float", val)
 				return "1 " + val + '\n'
 			else:
 				print("int", val)
+<<<<<<< HEAD
+=======
+=======
+				#print("float", val)
+				return "1 " + val + '\n'
+			else:
+				#print("int", val)
+>>>>>>> 9a608b328983947511e1e8c263a5ab5a48e7b6b6
+>>>>>>> 5fb5233fe7c02d410ae870c864bbca769ca21344
 				return "0 " + val + "\n"
 		except:
 			return "3 " + getAttr(string.strip()) + "\n"
@@ -82,7 +103,15 @@ def whereclause(cols, f1):
 	while cols != '':
 		m1 = re.compile(r'(.+?)[\s]*(AND|OR)[\s]+(.+)').match(cols)
 		if m1:
+<<<<<<< HEAD
 			m2 = re.compile(r'(.+?)(=|>|<|<=|>=|<>|like)([^><=]+)').match(m1.group(1))
+=======
+<<<<<<< HEAD
+			m2 = re.compile(r'(.+?)(=|>|<|<=|>=|<>|like)([^><=]+)').match(m1.group(1))
+=======
+			m2 = re.compile(r'(.+?)(=|>|<|<=|>=|<>|like)([^><=](.+))').match(m1.group(1))
+>>>>>>> 9a608b328983947511e1e8c263a5ab5a48e7b6b6
+>>>>>>> 5fb5233fe7c02d410ae870c864bbca769ca21344
 			tmpoutput = ""
 			if m2:
 				left = m2.group(1).strip()
@@ -117,7 +146,15 @@ def whereclause(cols, f1):
 			output.append(tmpoutput)
 			cols = m1.group(3).strip()
 		else:
+<<<<<<< HEAD
 			m2 = re.compile(r'(.+?)(<=|>=|<>|=|>|<|like)(.+)').match(cols)
+=======
+<<<<<<< HEAD
+			m2 = re.compile(r'(.+?)(<=|>=|<>|=|>|<|like)(.+)').match(cols)
+=======
+			m2 = re.compile(r'(.+?)(<=|>=|<>|=|>|<|like)([^><=](.+))').match(cols)
+>>>>>>> 9a608b328983947511e1e8c263a5ab5a48e7b6b6
+>>>>>>> 5fb5233fe7c02d410ae870c864bbca769ca21344
 			if m2:
 				tmpoutput = ""
 				left = m2.group(1).strip()
@@ -160,7 +197,15 @@ filename = sys.argv[1]
 f = open(filename)
 f1 = open("tmp.gen", "w")
 sqllist = f.read()
+<<<<<<< HEAD
 sqllist = sqllist.split(';')
+=======
+<<<<<<< HEAD
+sqllist = sqllist.split(';')
+=======
+sqllist = re.split(';\r\n|;\n', sqllist)
+>>>>>>> 9a608b328983947511e1e8c263a5ab5a48e7b6b6
+>>>>>>> 5fb5233fe7c02d410ae870c864bbca769ca21344
 res = []
 res.append(re.compile(r'SHOW[\s]+TABLES[\s]*'))
 res.append(re.compile(r'DROP[\s]+TABLE[\s]+([\w]+)'))
@@ -183,7 +228,17 @@ for sql in sqllist:
 	sql = sql.replace('\n', '').strip()
 	if sql == '':
 		continue
+<<<<<<< HEAD
 
+=======
+<<<<<<< HEAD
+
+=======
+	if sql[-1] == ';':
+		sql = sql[0:-1]
+	print sql
+>>>>>>> 9a608b328983947511e1e8c263a5ab5a48e7b6b6
+>>>>>>> 5fb5233fe7c02d410ae870c864bbca769ca21344
 	m = []
 	sqltype = -1
 	for i in range(len(res)):
@@ -203,14 +258,41 @@ for sql in sqllist:
 	elif sqltype == 2: #desc
 		print("cmd desc ", m.group(1))
 		f1.write("desc\n" + m.group(1) + "\n")
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+	
+>>>>>>> 9a608b328983947511e1e8c263a5ab5a48e7b6b6
+>>>>>>> 5fb5233fe7c02d410ae870c864bbca769ca21344
 	elif sqltype == 3: #create
 		print("cmd create table")
 		f1.write("createtable\n")
 		f1.write(m.group(1) + "\n")
 		print("Table name ", m.group(1))
+<<<<<<< HEAD
 		cols = m.group(2).split(',')
 		for i in range(len(cols)):
 			cols[i] = cols[i].strip()
+=======
+<<<<<<< HEAD
+		cols = m.group(2).split(',')
+		for i in range(len(cols)):
+			cols[i] = cols[i].strip()
+=======
+		temp = m.group(2).split(',')
+		cols = []
+		col = ''
+		for i in range(len(temp)):
+			col += temp[i]
+			if col.count('(') != col.count(')'):
+				col += ','
+				continue
+			cols.append(col.strip())
+			col = ''
+
+>>>>>>> 9a608b328983947511e1e8c263a5ab5a48e7b6b6
+>>>>>>> 5fb5233fe7c02d410ae870c864bbca769ca21344
 		m1 = re.compile(r'PRIMARY[\s]+KEY[\s]*\(([\w]+)\)').match(cols[-1])
 		cnt = len(cols)
 		if m1:
@@ -220,6 +302,24 @@ for sql in sqllist:
 		else:
 			print("Primary key ", "null")
 			f1.write("null\n")
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+		print cols[cnt-1]
+		m1 = re.compile(r'CHECK[\s]*\([\s]*([\w]+)[\s]+in[\s]*\((.+)\)[\s]*\)').match(cols[cnt-1])
+		if m1:
+			f1.write("check " + m1.group(1) + '\n')
+			res2 = m1.group(2).split(',')
+			f1.write(str(len(res2)) + '\n')
+			for item in res2:
+				f1.write(getvalue(item.strip()))
+			cnt = cnt - 1
+		else:
+			f1.write("nocheck\n")
+
+>>>>>>> 9a608b328983947511e1e8c263a5ab5a48e7b6b6
+>>>>>>> 5fb5233fe7c02d410ae870c864bbca769ca21344
 		f1.write(str(cnt) + "\n")
 		for i in range(cnt):
 			if len(cols[i].split(' ')) == 2:
@@ -262,6 +362,13 @@ for sql in sqllist:
 					error = 1
 			else:
 				error = 1
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+	
+>>>>>>> 9a608b328983947511e1e8c263a5ab5a48e7b6b6
+>>>>>>> 5fb5233fe7c02d410ae870c864bbca769ca21344
 	elif sqltype == 4: #insert
 		print("cmd insert")
 		cols = m.group(1).strip()
@@ -276,6 +383,10 @@ for sql in sqllist:
 		else:
 			f1.write("insert\n" + cols + " 0\n")
 		print("Table name ", m.group(1))
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 5fb5233fe7c02d410ae870c864bbca769ca21344
 		cols = m.group(2).strip()
 		output = []
 		while cols != '':
@@ -301,6 +412,54 @@ for sql in sqllist:
 		f1.write(str(len(output)) + "\n")
 		for item in output:
 			f1.write(item)
+<<<<<<< HEAD
+=======
+=======
+
+		cols = m.group(2).strip()
+		output = []
+
+		insert_list = re.split('(\)[\s]*,[\s]*\()', cols)
+
+		listnum = len(insert_list)
+		col = ''
+		for i in range(0, listnum, 2):
+			col += insert_list[i]
+			if col.count('\'') % 2 != 0:
+				col += insert_list[i + 1]
+				continue;
+
+			if col[0] == '(':
+				col = col[1:]
+
+			if col[-1] == ')':
+				col = col[0:-1]
+
+			value_list = col.split(',')
+			valuenum = len(value_list)
+			value = ''
+			tmpoutput = ''
+			numv = 0
+			for j in range(valuenum):
+				value += value_list[j]
+				if value.count('\'') % 2 != 0:
+					value += ','
+					continue
+
+				tmpoutput += getvalue(value.strip())
+				numv += 1
+				value = ''
+
+			tmpoutput = str(numv) + '\n' + tmpoutput
+			output.append(tmpoutput)
+
+			col = ''
+		f1.write(str(len(output)) + '\n')
+		for item in output:
+			f1.write(item)
+		
+>>>>>>> 9a608b328983947511e1e8c263a5ab5a48e7b6b6
+>>>>>>> 5fb5233fe7c02d410ae870c864bbca769ca21344
 
 	elif sqltype == 5: #delete
 		print("cmd delete")
@@ -401,6 +560,13 @@ for sql in sqllist:
 	else:
 		print("Syntax error")
 	#f1.write(data)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+
+>>>>>>> 9a608b328983947511e1e8c263a5ab5a48e7b6b6
+>>>>>>> 5fb5233fe7c02d410ae870c864bbca769ca21344
 f1.close()
 if error:
 	f1 = open("tmp.gen", "w")

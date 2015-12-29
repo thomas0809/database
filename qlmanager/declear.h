@@ -12,6 +12,7 @@
 #include "../systemmanager/sm_manager.h"
 #include "../recordmanager/RecordManager.h"
 #include "../common/common.h"
+#include "../indexmanager/IX_Manager.h"
 
 using namespace std;
 
@@ -39,14 +40,6 @@ using namespace std;
        // primaryKey = false;
    // }
 // };
-
-enum AggeType {
-    NONE,
-    SUM,
-    AVG,
-    MIN,
-    MAX
-};
 
 struct RelAttr {
     AggeType type;
@@ -81,18 +74,18 @@ struct Value {
         }
         return s;
         }
-	int getlength() const {
-		if (type == MyINT){
-			return sizeof(int);
-		}
-		else if (type == FLOAT){
-			return sizeof(float);
-		}
-		else if (type == STRING){
-			char *ddd = (char*)data;
-			return strlen(ddd);
-		}
-	}
+    int getlength() const {
+        if (type == MyINT){
+            return sizeof(int);
+        }
+        else if (type == FLOAT){
+            return sizeof(float);
+        }
+        else if (type == STRING){
+            char *ddd = (char*)data;
+            return strlen(ddd);
+        }
+    }
 };
 
 struct Condition {
@@ -140,7 +133,7 @@ struct Condition {
 class QL_Manager {
     public:
                                               // Constructor
-		QL_Manager (SM_Manager *_smm, RM_Manager *_rmm):smm(_smm), rmm(_rmm){}
+        QL_Manager (SM_Manager *_smm, RM_Manager *_rmm, IX_Manager *_ixm):smm(_smm), rmm(_rmm), ixm(_ixm){}
         //QL_Manager (SM_Manager &smm, IX_Manager &ixm, RM_Manager &rmm);
         ~QL_Manager ();                         // Destructor
         
@@ -153,103 +146,103 @@ class QL_Manager {
             } 
             cout << "nrid" << nrid << endl;
 	    for (int i = 0; i < nrid; i++)
-		cout << rid[i] << endl;
+			cout << rid[i] << endl;
             //select *
             int SelectPoint = 0;
             int newSelAttrs = 0;
             if (nSelAttrs == 1 && strcmp(selAttrs[0].attrName,"*") == 0){
-		cout << "select *" << endl;
-		SelectPoint = 1;
+				cout << "select *" << endl;
+				SelectPoint = 1;
             }
             RM_FileScan rfs = RM_FileScan(rmm->getFileManager(), rmm->getBufPageManager());
-	    RM_Record rec;
+        RM_Record rec;
             RM_FileHandle attrfh;
             int returnCode = 0; 
             rmm->OpenFile("attrcat",attrfh);
             returnCode = rfs.OpenScan(attrfh, STRING, strlen(relName), 16, EQ_OP, (void*)relName);
-	    int x = 0;
+        int x = 0;
             DataAttrInfo * getAttr;
             if (SelectPoint == 0)
-            	getAttr = new DataAttrInfo[nSelAttrs];
+                getAttr = new DataAttrInfo[nSelAttrs];
             else
-		getAttr = new DataAttrInfo[MAXATTRNUMBER];
+        getAttr = new DataAttrInfo[MAXATTRNUMBER];
 
-	    while (returnCode == 1){
-//		cout << "ret : 1" << endl;
-		x = rfs.GetNextRec(rec);
-//		cout << "ret : 2" << endl;
-		if (x == -1)
-			break;
-//		cout << x << endl;
-		DataAttrInfo * mydata;
-		rec.GetData((char*&) mydata);
-//	        cout << mydata->attrName << endl;
-//		cout << cond->lhsAttr.attrName << endl;
-		if (SelectPoint == 0){
-			for (int i = 0; i < nSelAttrs; i++){
-				if (strcmp(mydata->attrName, selAttrs[i].attrName) == 0 && strcmp(mydata->relName, relName) == 0){
-//					cout << "offset: " << mydata->offset << "i: " << i << endl;
-//					cout << sizeof(DataAttrInfo) << endl;
-					memcpy(&(getAttr[i]), mydata, sizeof(DataAttrInfo));
-//					cout << getAttr[i].offset << endl;
-					break;
-				}
-			}
-		}
-		else{
-			if (strcmp(mydata->relName, relName) == 0){
-				memcpy(&(getAttr[newSelAttrs]), mydata, sizeof(DataAttrInfo));
-				newSelAttrs++;
-			}
-		}
-	    }
-	    rfs.CloseScan();
+        while (returnCode == 1){
+//      cout << "ret : 1" << endl;
+        x = rfs.GetNextRec(rec);
+//      cout << "ret : 2" << endl;
+        if (x == -1)
+            break;
+//      cout << x << endl;
+        DataAttrInfo * mydata;
+        rec.GetData((char*&) mydata);
+//          cout << mydata->attrName << endl;
+//      cout << cond->lhsAttr.attrName << endl;
+        if (SelectPoint == 0){
+            for (int i = 0; i < nSelAttrs; i++){
+                if (strcmp(mydata->attrName, selAttrs[i].attrName) == 0 && strcmp(mydata->relName, relName) == 0){
+//                  cout << "offset: " << mydata->offset << "i: " << i << endl;
+//                  cout << sizeof(DataAttrInfo) << endl;
+                    memcpy(&(getAttr[i]), mydata, sizeof(DataAttrInfo));
+//                  cout << getAttr[i].offset << endl;
+                    break;
+                }
+            }
+        }
+        else{
+            if (strcmp(mydata->relName, relName) == 0){
+                memcpy(&(getAttr[newSelAttrs]), mydata, sizeof(DataAttrInfo));
+                newSelAttrs++;
+            }
+        }
+        }
+        rfs.CloseScan();
             rmm->CloseFile(attrfh);
-	    
+        
             if (SelectPoint != 0){
-		cout << "new SelAttrs" << newSelAttrs << endl;
-		nSelAttrs = newSelAttrs;
-	    }
-	    cout << "Start print attrName: " << endl;
-	    for (int i = 0; i < nSelAttrs; i++)
-		cout << getAttr[i].attrName << ' ' <<getAttr[i].offset << endl;
-	    
-	    //get record
-	    cout << "ALL RECORD========= (0_0)=========" << endl;
+        cout << "new SelAttrs" << newSelAttrs << endl;
+        nSelAttrs = newSelAttrs;
+        }
+        cout << "Start print attrName: " << endl;
+        for (int i = 0; i < nSelAttrs; i++)
+        cout << getAttr[i].attrName << ' ' <<getAttr[i].offset << endl;
+        
+        //get record
+        cout << "ALL RECORD========= (0_0)=========" << endl;
             for (int i = 0; i < nrid; i++){
                 rmm->OpenFile(relName, attrfh);
-		RM_Record tempRec;
-		cout << rid[i] << endl;
+        RM_Record tempRec;
+        cout << rid[i] << endl;
                 attrfh.GetRec(rid[i], tempRec);
-		void *temp;
-		temp = tempRec.data;
-//		for (int i = 0; i < strlen(temp); i++)
-//			cout << temp[i];
+        char *temp;
+        temp = tempRec.data;
+//      for (int i = 0; i < strlen(temp); i++)
+//          cout << temp[i];
                 for (int j = 0; j < nSelAttrs; j++){
-//			cout << selAttrs[j].attrName << ' ' << getAttr[j].offset << ' ';
-			cout << getAttr[j].attrName << ": ";
-			char* buf = new char[MAXATTRLENGTH];
-			memset(buf, 0, MAXATTRLENGTH);
-			int length = 0;
-			if (getAttr[j].attrType == MyINT)
-				length = sizeof(int);
-			else if (getAttr[j].attrType == FLOAT)
-				length = sizeof(float);
-			else
-				length = getAttr[j].attrLength;
-			memcpy(buf, temp + getAttr[j].offset, length);
-//			cout << "buf: ";
-//			for (int k = 0; k < 10; k++)
-//				cout << buf[k];
-//			cout << endl;
+//          cout << selAttrs[j].attrName << ' ' << getAttr[j].offset << ' ';
+            cout << getAttr[j].attrName << ": ";
+            char* buf = new char[MAXATTRLENGTH];
+            memset(buf, 0, MAXATTRLENGTH);
+            int length = 0;
+            if (getAttr[j].attrType == MyINT)
+                length = sizeof(int);
+            else if (getAttr[j].attrType == FLOAT)
+                length = sizeof(float);
+            else
+                length = getAttr[j].attrLength;
+            memcpy(buf, temp + getAttr[j].offset, length);
+//          cout << "buf: ";
+//          for (int k = 0; k < 10; k++)
+//              cout << buf[k];
+//          cout << endl;
                         if (getAttr[j].attrType == MyINT){
                              int* t = (int*)buf;
                              cout << *t;
-			}
+            }
                         else if (getAttr[j].attrType == FLOAT){
-			     float* t = (float*)buf;
+                 float* t = (float*)buf;
                              cout << *t;
-			}
+            }
                         if (getAttr[j].attrType == STRING){
                              char* t = buf;
 			     cout << t;
@@ -273,6 +266,7 @@ class QL_Manager {
                    const Condition conditions[],  // conditions in Where clause
                    const RelAttr& groupAttr) 
         {
+        cout << "shabi" << endl;
             cout << "QL Select Function" << endl;
    /*       cout << "NSelAttr : " << nSelAttrs << endl;
             for(int i = 0; i < nSelAttrs; i++) {
@@ -851,122 +845,172 @@ class QL_Manager {
 
             }
             cout << "nAttr : " << nattr << endl;
-			
+            
             for(int i = 0; i < nattr; i++) {
                 cout << attr[i].attrName << endl;
             }*/
-	    
-//	    cout << "debug: 1" << endl;
-	    smm->GetTable(relName, countAttr, dataInfo);
-//	    cout << "countAttr: " << countAttr << endl;
-//	    cout << dataInfo[0].attrLength << endl;
+        
+//      cout << "debug: 1" << endl;
+            smm->GetTable(relName, countAttr, dataInfo);
+//      cout << "countAttr: " << countAttr << endl;
+            cout << dataInfo[0].attrLength << endl;
             //insert into Table, check value type
 
-	    for (int i = 0; i < countAttr; i++)
-		inSet[i] = -1;
-	    for (int i = 0; i < nValues; i++)
-		label[i] = -1;
+            for (int i = 0; i < countAttr; i++)
+                inSet[i] = -1;
+            for (int i = 0; i < nValues; i++)
+                label[i] = -1;
 
-	    if (nattr == 0){
-	    	if (countAttr != nValues){
-		    cout << "Insert Error: value number is incorrect" << endl;		
-		    return;
-	    	}
-		for (int i = 0; i < countAttr; i++){
-		    if (values[i].type == 3){
-			if (dataInfo[i].notNull == 1){
-			    cout << "Insert Error: not Null: " << dataInfo[i].attrName <<  endl; 
-			    return;
-			}
-			else{
-			    label[i] = -2;
-			}
-		    }
-		    else{
-			if (dataInfo[i].attrType != values[i].type){
-				cout << "Insert Error: value type is incorrect: " << dataInfo[i].attrName << ' ' << dataInfo[i].attrType << endl;
-				return;
-			}
-			label[i] = i;
-		    }		
-		}
-	    }
-	    else{
-		if (nattr != nValues){
-		    cout << "Insert Error: value number is incorrect" << endl;	
-		    return;	
-		}
-	    }
-	    //get all dataInfo
-/*	    for (int i = 0; i < countAttr; i++)
-		cout << dataInfo[i].notNull<< ' ';
-	    cout << endl;
-	    for (int i = 0; i < countAttr; i++)
-		dataInfo[i].print();*/
-	    for (int i = 0; i < countAttr; i++){
-		size += dataInfo[i].attrLength; 
-	    }
-	    if (nattr != 0){
-	    //check attr type
-            	for (int i = 0; i < nValues; i++){
-		    for (int j = 0; j < countAttr; j++){
-		    	if (strcmp(attr[i].attrName, dataInfo[j].attrName) == 0){
-		    	    if (inSet[j] != -1){
-			        cout << "Insert Error: same attribute: " << attr[i].attrName <<  endl;
-				return;
-			    }
-			    // if value = null
-			    if (values[i].type == 3){
-				inSet[j] = -2;
-				label[i] = -2;
-			    }
-                            else{
-				inSet[j] = i; 
-                            	label[i] = j;
-			    }
-		            break;
-		    	}
-		    }
+            if (nattr == 0){
+                if (countAttr != nValues){
+                    cout << "Insert Error: value number is incorrect" << endl;      
+                    return;
                 }
                 for (int i = 0; i < countAttr; i++){
-		    if (inSet[i] <= -1 && dataInfo[i].notNull == 1){
-			cout << "Insert Error: not Null: " << dataInfo[i].attrName <<  endl; 
-			return;
-		    }		
-		}
-	    }
-	    //在relname中查找，重新获取长度
-//	    cout << "debug: 2   size" << size << endl;
-/*           cout << "label" << ' ';
-	    for (int i = 0; i < nValues; i++)
-		cout << label[i] << ' ';
-	    cout << endl;*/
-	    rmm->OpenFile(relName, attrfh);
-	    char *buf = new char[size + countAttr];
-//	    cout << "debug: 3.1" << endl;
-	    memset(buf, 0, size + countAttr);
-	    for(int i = 0; i < nValues; i++) {
-		if (label[i] <= -1)
-		    continue;
-//	    	cout << "debug: 3.2" << endl;
-	    	int length = 0;
-//		cout << label[i] <<"label[i]" << dataInfo[label[i]].attrName << ' ' << values[i] << endl;
-	    	memcpy(buf + dataInfo[label[i]].offset, values[i].data, values[i].getlength());
-//	    	cout << "length: " << values[i].getlength() << endl;
-//	    	cout << "debug: 3" << endl;
-		buf[size + label[i]] = 1;
-	    }
-			
-//	    cout << "debug: 4" << endl;
-	    attrfh.InsertRec(buf, rid);
-//	    cout << "Insert Correctly, Rid: " << rid.Page() << ' ' << rid.Slot() << endl;
-	    rmm->CloseFile(attrfh);
-	    delete []buf;
-	    delete []dataInfo;
-//          cout << "END INSERT" << endl;
+                    if (values[i].type == 3){
+                        if (dataInfo[i].notNull == 1){
+                            cout << "Insert Error: not Null: " << dataInfo[i].attrName <<  endl; 
+                            return;
+                        }
+                        else{
+                            label[i] = -2;
+                        }
+                    }
+                    else{
+                        if (dataInfo[i].attrType != values[i].type){
+                            cout << "Insert Error: value type is incorrect: " << dataInfo[i].attrName << ' ' << dataInfo[i].attrType << endl;
+                            return;
+                        }
+                        label[i] = i;
+                    }       
+                }
+            }
+            else{
+                if (nattr != nValues){
+                    cout << "Insert Error: value number is incorrect" << endl;  
+                    return; 
+                }
+            }
+        //get all dataInfo
+/*      for (int i = 0; i < countAttr; i++)
+        cout << dataInfo[i].notNull<< ' ';
+        cout << endl;
+        for (int i = 0; i < countAttr; i++)
+        dataInfo[i].print();*/
+            for (int i = 0; i < countAttr; i++){
+                size += dataInfo[i].attrLength; 
+            }
+
+            if (nattr != 0){
+        //check attr type
+                for (int i = 0; i < nValues; i++){
+                    for (int j = 0; j < countAttr; j++){
+                        if (strcmp(attr[i].attrName, dataInfo[j].attrName) == 0){
+                            if (inSet[j] != -1){
+                                cout << "Insert Error: same attribute: " << attr[i].attrName <<  endl;
+                                return;
+                            }
+                // if value = null
+                            if (values[i].type == 3){
+                                inSet[j] = -2;
+                                label[i] = -2;
+                            }
+                            else{
+                                inSet[j] = i; 
+                                label[i] = j;
+                            }
+                            break;
+                        }
+                    }
+                }
+                for (int i = 0; i < countAttr; i++){
+                    if (inSet[i] <= -1 && dataInfo[i].notNull == 1){
+                        cout << "Insert Error: not Null: " << dataInfo[i].attrName <<  endl; 
+                        return;
+                    }       
+                }
+            }
+        //在relname中查找，重新获取长度
+//      cout << "debug: 2   size" << size << endl;
+            cout << "label" << ' ';
+            for (int i = 0; i < nValues; i++)
+                cout << label[i] << ' ';
+            cout << endl;
+        
+            char *buf = new char[size + countAttr];
+//      cout << "debug: 3.1" << endl;
+            memset(buf, 0, size + countAttr);
+
+            bool primaryKey = false;
+
+            for(int i = 0; i < nValues; i++) {
+                if (label[i] <= -1)
+                    continue;
+//          cout << "debug: 3.2" << endl;
+                int length = 0;
+                cout << label[i] <<"label[i]" << dataInfo[label[i]].attrName << ' ' << values[i] << endl;
+                memcpy(buf + dataInfo[label[i]].offset, values[i].data, values[i].getlength());
+//          cout << "length: " << values[i].getlength() << endl;
+//          cout << "debug: 3" << endl;
+                buf[size + label[i]] = 1;
+                if (dataInfo[label[i]].primaryKey) {
+                    primaryKey = true;
+                    IX_IndexHandle ixh;
+                    ixm->OpenIndex(relName, dataInfo[label[i]].attrName, ixh);
+                    IX_IndexScan ixscan;
+                    ixscan.OpenScan(ixh, EQ_OP, values[i].data);
+                    RID tmprid;
+                    if (ixscan.GetNextEntry(tmprid) != -1) {
+                        ixm->CloseIndex(ixh);
+                        return;
+                    }
+                    ixm->CloseIndex(ixh);
+                }
+                char checkname[512];
+                memset(checkname, 0, sizeof checkname);
+                sprintf(checkname, "%s.%s.check.index", relName, dataInfo[label[i]].attrName);
+                if (access(checkname, 0) != -1) {
+                    IX_IndexHandle ixh;
+                    memset(checkname, 0, sizeof checkname);
+                    sprintf(checkname, "%s.check", dataInfo[label[i]].attrName);
+                    ixm->OpenIndex(relName, checkname, ixh);
+                    IX_IndexScan ixscan;
+                    ixscan.OpenScan(ixh, EQ_OP, values[i].data);
+                    RID tmprid;
+                    if (ixscan.GetNextEntry(tmprid) == -1) {
+                        ixm->CloseIndex(ixh);
+                        return;
+                    }
+                    ixm->CloseIndex(ixh);
+                }
+            }
+//          cout << "debug: 4" << endl;
+            if (!primaryKey) {
+                return;
+            }
+            rmm->OpenFile(relName, attrfh);
+            attrfh.InsertRec(buf, rid);
+
+            for(int i = 0; i < nValues; i++) {
+                char indexname[100];
+                memset(indexname, 0, sizeof indexname);
+                sprintf(indexname, "%s.%s.index", relName, dataInfo[i].attrName);
+                if (access(indexname, 0) != -1) {
+                    IX_IndexHandle ixh;
+                    ixm->OpenIndex(relName, dataInfo[i].attrName, ixh);
+                    ixh.InsertEntry(values[i].data, rid);
+                    ixm->CloseIndex(ixh);
+                }
+            }
+//          cout << "Insert Correctly, Rid: " << rid.Page() << ' ' << rid.Slot() << endl;
+            rmm->CloseFile(attrfh);
+            delete []buf;
+            delete []dataInfo;
+            cout << "END INSERT" << endl;
         }
 
         void Search(const char* relName, const Condition* cond, int& nrid, RID*& rid) {//need two RM_Record, rid = newRID[500000];
+
             cout << "QL Search Function" << endl;
             cout << relName << endl;
             cout << (cond->lhsAttr.relName == NULL) << ' ' << cond->lhsAttr.attrName << endl;
@@ -978,26 +1022,26 @@ class QL_Manager {
             else {
                 cout << cond->rhsValue;
             }}
-	    cout << "debug: qby 1" << endl;
+			cout << "debug: qby 1" << endl;
             nrid = 0;
             rid = new RID[MAXRID];
             //check bRhsIsAttr, if bRhsIsAttr == true ,exit
-            if (cond->bRhsIsAttr){
-		cout << "Error:  WHERE ? op value" << endl;
-		return;
+            if (cond->bRhsIsAttr) {
+                cout << "Error:  WHERE ? op value" << endl;
+                return;
             }
             RM_FileScan rfs = RM_FileScan(rmm->getFileManager(), rmm->getBufPageManager());
-	    RM_FileHandle attrfh;
-	    RM_Record rec;
-	    RID tempRid;
-	    int returnCode;
-	    AttrType attrType;
+            RM_FileHandle attrfh;
+            RM_Record rec;
+            RID tempRid;
+            int returnCode;
+            AttrType attrType;
             int attrLength;
             int attrOffset;
-	    int attrIndexNo;
+			int attrIndexNo;
             int inRel = -1;
 
-//	    cout << "debug: qby 2" << endl;
+//      cout << "debug: qby 2" << endl;
             //get attrType
             rmm->OpenFile("attrcat",attrfh);
             returnCode = rfs.OpenScan(attrfh, STRING, strlen(relName), 16, EQ_OP, (void*)relName);
@@ -1025,50 +1069,73 @@ class QL_Manager {
 	    rfs.CloseScan();
             rmm->CloseFile(attrfh);
             
-//	    cout << "debug: qby 3" << endl;
+//      cout << "debug: qby 3" << endl;
             if (inRel == -1){
-	    	cout << "Attribute not in Relation!" << endl;
-		return;
-	    }
-	    cout << "attrType: " << attrType << endl;
-	    cout << "attrLength: " << attrLength << endl;
-	    cout << "attrOffset: " << attrOffset << endl;	 
-	    cout << "attrIndexNo: " << attrIndexNo << endl;   
-            returnCode = 0;
-            rmm->OpenFile(relName, attrfh);
-//	    for (int i = 0; i < 10; i++)
-//		cout << *(char*)(cond->rhsValue.data+ i) << ' ';
-//	    cout << endl;
-	    returnCode = rfs.OpenScan(attrfh, attrType, attrLength, attrOffset, cond->op, cond->rhsValue.data, attrIndexNo);
-//	    cout << returnCode << endl;
-	    RM_Record rec_1;
-	    while (returnCode == 1){
-//		cout << "ret : 1" << endl;
-		x = rfs.GetNextRec(rec_1);
-//		cout << "ret : 2" << endl;
-		if (x == -1)
-			break;
-//		cout << x << endl;
-//		char* t = new char[100];
-//		char* temp = NULL;
-//		rec_1.GetData((char*&) temp);
+            cout << "Attribute not in Relation!" << endl;
+        return;
+        }
 
-//		for (int i = 0; i < 100; i++)
-//			cout << temp[i];
-//		cout << t << endl;		
-//		strncpy(t, temp, 100);
-//		for (int i = 0; i < 100; i++)
-//			cout << t[i];
-//		cout << t << endl;
-//		delete []t;
-		rec_1.GetRid(tempRid);
-		rid[nrid].Copy(tempRid);
-		cout << rid[nrid] << endl;
-		nrid++;
-//		cout << "get Rid: " << tempRid << endl;
-	    }
-	    rfs.CloseScan();
-	    rmm->CloseFile(attrfh);
+        //cout << "attrType: " << attrType << endl;
+        //cout << "attrLength: " << attrLength << endl;
+        //cout << "attrOffset: " << attrOffset << endl;
+
+        char buf[100];
+        memset(buf, 0, sizeof buf);
+        sprintf(buf, "%s.%s.index", relName, cond->lhsAttr.attrName);
+        if (access(buf, 0) != -1) {
+            IX_IndexHandle ixh;
+            ixm->OpenIndex(relName, cond->lhsAttr.attrName, ixh);
+            IX_IndexScan ixscan;
+            //printf("%s\n", cond->rhsValue.data);
+            ixscan.OpenScan(ixh, cond->op, cond->rhsValue.data);
+            RID tmprid;
+            nrid = 0;
+            while (ixscan.GetNextEntry(tmprid) != -1) {
+                rid[nrid] = tmprid;
+                nrid += 1;
+            }
+            //ixh.PrintEntries();
+            ixm->CloseIndex(ixh);
+            printf("search from index, %d\n", nrid);
+            return;
+        }
+
+
+            returnCode = 0;
+        rmm->OpenFile(relName, attrfh);
+        for (int i = 0; i < 10; i++)
+            cout << *((char*)(cond->rhsValue.data)+ i) << ' ';
+        cout << endl;
+        returnCode = rfs.OpenScan(attrfh, attrType, attrLength, attrOffset, cond->op, cond->rhsValue.data);
+        cout << returnCode << endl;
+        RM_Record rec_1;
+        while (returnCode == 1) {
+//      cout << "ret : 1" << endl;
+            x = rfs.GetNextRec(rec_1);
+//      cout << "ret : 2" << endl;
+            if (x == -1)
+                break;
+//      cout << x << endl;
+//      char* t = new char[100];
+//      char* temp = NULL;
+//      rec_1.GetData((char*&) temp);
+
+//      for (int i = 0; i < 100; i++)
+//          cout << temp[i];
+//      cout << t << endl;      
+//      strncpy(t, temp, 100);
+//      for (int i = 0; i < 100; i++)
+//          cout << t[i];
+//      cout << t << endl;
+//      delete []t;
+            rec_1.GetRid(tempRid);
+            rid[nrid].Copy(tempRid);
+            cout << rid[nrid] << endl;
+            nrid++;
+//      cout << "get Rid: " << tempRid << endl;
+        }
+        rfs.CloseScan();
+        rmm->CloseFile(attrfh);
             cout << "END SEARCH" << endl;
         }
 
@@ -1079,14 +1146,34 @@ class QL_Manager {
             cout << "QL Delete Function" << endl;
             cout << relName << endl;
             cout << nrid << endl;
- 	    RM_FileScan rfs = RM_FileScan(rmm->getFileManager(), rmm->getBufPageManager());
-	    RM_Record rec;
+        RM_FileScan rfs = RM_FileScan(rmm->getFileManager(), rmm->getBufPageManager());
+        RM_Record rec;
             RM_FileHandle attrfh;
+            int countAttr = 0;
+            DataAttrInfo* dataInfo = NULL;
+            smm->GetTable(relName, countAttr, dataInfo);
+
             rmm->OpenFile(relName,attrfh);
-	    for (int i = 0; i < nrid; i++){
-	    	attrfh.DeleteRec(rid[i]);
-	    }
-	    rmm->CloseFile(attrfh);
+        for (int j = 0; j < countAttr; j++) {
+            char indexname[100];
+            memset(indexname, 0, sizeof indexname);
+            sprintf(indexname, "%s.%s.index", relName, dataInfo[j].attrName);
+            if (access(indexname, 0) != -1) {
+                IX_IndexHandle ixh;
+                ixm->OpenIndex(relName, dataInfo[j].attrName, ixh);
+                for (int i = 0; i < nrid; i++) {
+                    RM_Record rec;
+                    attrfh.GetRec(rid[i], rec);
+                    char *data = rec.data + dataInfo[j].offset;
+                    ixh.DeleteEntry(data, rid[i]);
+                }
+                ixm->CloseIndex(ixh);
+            }
+        }
+        for (int i = 0; i < nrid; i++){
+            attrfh.DeleteRec(rid[i]);
+        }
+        rmm->CloseFile(attrfh);
             cout << "END DELETE" << endl << endl;
 
         }
@@ -1111,127 +1198,149 @@ class QL_Manager {
             //get position of updata attr
 
             RM_FileScan rfs = RM_FileScan(rmm->getFileManager(), rmm->getBufPageManager());
-	    RM_Record rec;
+            RM_Record rec;
             RM_FileHandle attrfh;
             int returnCode = 0; 
             rmm->OpenFile("attrcat",attrfh);
             returnCode = rfs.OpenScan(attrfh, STRING, strlen(relName), 16, EQ_OP, (void*)relName);
-	    int x = 0;
+            int x = 0;
 
             DataAttrInfo lAttrInfo;
             DataAttrInfo rAttrInfo;
 
-	    while (returnCode == 1){
-//		cout << "ret : 1" << endl;
-		x = rfs.GetNextRec(rec);
-//		cout << "ret : 2" << endl;
-		if (x == -1)
-			break;
-//		cout << x << endl;
-		DataAttrInfo * mydata;
-		rec.GetData((char*&) mydata);
-//	        cout << mydata->attrName << endl;
-//		cout << cond->lhsAttr.attrName << endl;
-		if (strcmp(mydata->attrName, updAttr.attrName) == 0){
-			memcpy(&lAttrInfo, mydata, sizeof(DataAttrInfo));			
-		}
-		if (!bIsValue){
-			if (strcmp(mydata->attrName, rhsRelAttr.attrName) == 0){
-				memcpy(&rAttrInfo, mydata, sizeof(DataAttrInfo));
-			}
-		}
-	    }
-	    rfs.CloseScan();
+            while (returnCode == 1){
+//      cout << "ret : 1" << endl;
+                x = rfs.GetNextRec(rec);
+//      cout << "ret : 2" << endl;
+                if (x == -1)
+                    break;
+//      cout << x << endl;
+                DataAttrInfo * mydata;
+                rec.GetData((char*&) mydata);
+//          cout << mydata->attrName << endl;
+//      cout << cond->lhsAttr.attrName << endl;
+                if (strcmp(mydata->attrName, updAttr.attrName) == 0){
+                    memcpy(&lAttrInfo, mydata, sizeof(DataAttrInfo));           
+                }
+                if (!bIsValue){
+                    if (strcmp(mydata->attrName, rhsRelAttr.attrName) == 0){
+                        memcpy(&rAttrInfo, mydata, sizeof(DataAttrInfo));
+                    }
+                }
+            }
+            rfs.CloseScan();
             rmm->CloseFile(attrfh);
 
-	    if (!bIsValue && ((lAttrInfo.attrType != rAttrInfo.attrType)
-		|| (lAttrInfo.attrLength != rAttrInfo.attrLength))){
-		cout << "Updata Error: type is not equal " << endl;
-		return;
-	    }
+            if (!bIsValue && ((lAttrInfo.attrType != rAttrInfo.attrType)
+            || (lAttrInfo.attrLength != rAttrInfo.attrLength))){
+                cout << "Updata Error: type is not equal " << endl;
+                return;
+            }
+
+            rmm->OpenFile(relName, attrfh);
+            char indexname[1024];
+            memset(indexname, 0, sizeof indexname);
+            sprintf(indexname, "%s.%s.index", relName, lAttrInfo.attrName);
+            bool indexed = false;
+            IX_IndexHandle ixh;
+            if (access(indexname, 0) != -1) {
+                ixm->OpenIndex(relName, lAttrInfo.attrName, ixh);
+                indexed = true;
+            }
+
             for (int i = 0; i < nrid; i++){
-                rmm->OpenFile(relName, attrfh);
-		RM_Record tempRec;
-		cout << rid[i] << endl;
-                attrfh.GetRec(rid[i], tempRec);
-		void *temp;
-		temp = tempRec.data;
-		
-//		for (int i = 0; i < strlen(temp); i++)
-//			cout << temp[i];
-		char* buf = new char[MAXATTRLENGTH];
-		memset(buf, 0, MAXATTRLENGTH);
-		int length = 0;
-		if (lAttrInfo.attrType == MyINT)
-			length = sizeof(int);
-		else if (lAttrInfo.attrType == FLOAT)
-			length = sizeof(float);
-		else
-			length = lAttrInfo.attrLength;
-		cout << "lAttrInfo.offset" << lAttrInfo.offset << endl;
-		cout << "attrLength => " << length << endl;
-		memcpy(buf, temp + lAttrInfo.offset, length);
-		char* rbuf = new char[MAXATTRLENGTH];
-		memset(rbuf, 0, MAXATTRLENGTH);
-		if (!bIsValue)
-			memcpy(rbuf, temp + rAttrInfo.offset, length);
-		else
-			memcpy(rbuf, rhsValue.data, length);
-//		for (int j = 0; j < length; j++){
-//			cout << buf[j] << rbuf[j] << ' ';		
-//		}
-		if (lAttrInfo.attrType == STRING){
-		    for (int j = 0; j < length; j++)
-			if (rbuf[j] == 0){
-			    length = j;
-			    break;
-			}
-		}
-		memcpy(temp + lAttrInfo.offset, rbuf, length);
-		rbuf[0] = 1;
-		//delete null
-		memcpy(temp + lAttrInfo.indexNo, rbuf, 1);
-		attrfh.UpdateRec(tempRec);
-		cout << endl;
+            RM_Record tempRec;
+            cout << rid[i] << endl;
+            attrfh.GetRec(rid[i], tempRec);
+            char *temp;
+            temp = (char*)tempRec.data;
+        
+//      for (int i = 0; i < strlen(temp); i++)
+//          cout << temp[i];
+            char* buf = new char[MAXATTRLENGTH];
+            memset(buf, 0, MAXATTRLENGTH);
+            int length = 0;
+            if (lAttrInfo.attrType == MyINT)
+                length = sizeof(int);
+            else if (lAttrInfo.attrType == FLOAT)
+                length = sizeof(float);
+            else
+                length = lAttrInfo.attrLength;
+            cout << "lAttrInfo.offset" << lAttrInfo.offset << endl;
+            cout << "attrLength => " << length << endl;
+            memcpy(buf, temp + lAttrInfo.offset, length);
+            char* rbuf = new char[MAXATTRLENGTH];
+            memset(rbuf, 0, MAXATTRLENGTH);
+            if (!bIsValue)
+                memcpy(rbuf, temp + rAttrInfo.offset, length);
+            else
+                memcpy(rbuf, rhsValue.data, length);
+//      for (int j = 0; j < length; j++){
+//          cout << buf[j] << rbuf[j] << ' ';       
+//      }
+            if (lAttrInfo.attrType == STRING){
+                for (int j = 0; j < length; j++)
+                    if (rbuf[j] == 0){
+                    length = j + 1;
+                    break;
+                }
+            }
+
+            if (indexed) {
+                ixh.DeleteEntry(temp + lAttrInfo.offset, rid[i]);
+                ixh.InsertEntry(rbuf, rid[i]);
+            }
+
+            memcpy(temp + lAttrInfo.offset, rbuf, length);
+            //printf("!!!!!!!!! %s\n%s %d\n", rbuf, temp + lAttrInfo.offset, length);
+            rbuf[0] = 1;
+        //delete null
+            memcpy(temp + lAttrInfo.indexNo, rbuf, 1);
+            attrfh.UpdateRec(tempRec);
+            cout << endl;
 /*                for (int j = 0; j < nSelAttrs; j++){
-//			cout << selAttrs[j].attrName << ' ' << getAttr[j].offset << ' ';
-			cout << selAttrs[j].attrName << ' ';
-			char* buf = new char[400];
-			memset(buf, 0, 400);
-			int length = 0;
-			if (getAttr[j].attrType == MyINT)
-				length = sizeof(int);
-			else if (getAttr[j].attrType == FLOAT)
-				length = sizeof(float);
-			else
-				length = getAttr[j].attrLength;
-			memcpy(buf, temp + getAttr[j].offset, length);
-//			cout << "buf: ";
-//			for (int k = 0; k < 10; k++)
-//				cout << buf[k];
-//			cout << endl;
+//          cout << selAttrs[j].attrName << ' ' << getAttr[j].offset << ' ';
+            cout << selAttrs[j].attrName << ' ';
+            char* buf = new char[400];
+            memset(buf, 0, 400);
+            int length = 0;
+            if (getAttr[j].attrType == MyINT)
+                length = sizeof(int);
+            else if (getAttr[j].attrType == FLOAT)
+                length = sizeof(float);
+            else
+                length = getAttr[j].attrLength;
+            memcpy(buf, temp + getAttr[j].offset, length);
+//          cout << "buf: ";
+//          for (int k = 0; k < 10; k++)
+//              cout << buf[k];
+//          cout << endl;
                         if (getAttr[j].attrType == MyINT){
                              int* t = (int*)buf;
                              cout << *t;
-			}
+            }
                         else if (getAttr[j].attrType == FLOAT){
-			     float* t = (float*)buf;
+                 float* t = (float*)buf;
                              cout << *t;
-			}
+            }
                         if (getAttr[j].attrType == STRING){
                              char* t = buf;
-			     cout << t;
-			}
+                 cout << t;
+            }
                         cout << ' ';
-		}*/
-		rmm->CloseFile(attrfh);
-            }         
+        }*/
+            }   
+            rmm->CloseFile(attrfh);      
+            if (indexed) {
+                ixm->CloseIndex(ixh);
+            }
             cout << "END UPDATE" << endl << endl;
         }
-		
+        
 private:
-	SM_Manager *smm;
-	RM_Manager *rmm;
+    SM_Manager *smm;
+    RM_Manager *rmm;
+    IX_Manager *ixm;
 };
 
 #endif

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 USE orderDB;
 INSERT INTO book VALUES 
  (200001,'Marias Diary (Plus S.)','Mark P. O. Morford',100082,5991,2530),
@@ -50058,3 +50059,35 @@ INSERT INTO book VALUES
  (249998,'Braid: Poems (Florida Poetry Series)','W. Scott Olsen',102883,7081,2261),
  (249999,'Falling For You (First Love, No 215)','Tena Carlyle',104386,3283,1436),
  (250000,'A Cherished Reward (Homespun Series)','Anthony Boucher',100339,7366,2711);
+=======
+CREATE DATABASE qby;
+DROP DATABASE qby;
+CREATE DATABASE qby;
+DROP DATABASE qby;
+CREATE DATABASE qby;
+USE qby;
+CREATE TABLE book(id int(10) NOT NULL,name varchar(200),author varchar(200), day int(5),month int(5),year int(5));
+CREATE TABLE order(id int(10), name varchar(200));
+SHOW TABLES;
+SHOW book;
+SHOW order;
+INSERT INTO order VALUES (200002, 'AAAA');
+INSERT INTO order VALUES (200003, 'BBBB');
+INSERT INTO order VALUES (200004, 'CCCC');
+INSERT INTO order VALUES (200005, 'DDDD');
+INSERT INTO order VALUES (200006, 'EEEE');
+INSERT INTO book VALUES (200002,'Standing in the Shadows','Richard Bruce Wright',101787,2900,1860);
+INSERT INTO book VALUES (200002, 2);
+INSERT INTO book VALUES (200003,'Children of the Thunder',null,123,3447,2154);
+INSERT INTO book VALUES (200279,'Breakout from Stalingrad','Muriel Whitaker',null,5437,1336);
+INSERT INTO book VALUES (200003,'Children of the Thunder','Carlo DEste','HAHA',3447,2154);
+INSERT INTO book(name, author) VaLUES ('Children of the Thunder','Carlo DEste');
+INSERT INTO book(id, name, author, month, year) VALUES (200001,'Marias Diary (Plus S.)','Mark P. O. Morford',100082,5991);
+SELECT id, name, author FROM book WHERE day is null AND id < 200003;
+SELECT * FROM order WHERE id = 200002;
+INSERT INTO book(name, author) VALUES ('Children of the Thunder','Carlo DEste');
+SELECT id, name, author FROM book WHERE id = 200003;
+UPDATE book SET author = 'Carlo DEste' WHERE id > 200002;
+SELECT id, name, author FROM book WHERE id = 200003;
+SELECT id, name, author FROM book WHERE day < 100;
+>>>>>>> 5fb5233fe7c02d410ae870c864bbca769ca21344

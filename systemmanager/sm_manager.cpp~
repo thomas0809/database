@@ -110,7 +110,11 @@ int SM_Manager::CreateTable (const char *relName,                // 创建表, 这里
 		myLog->LogDebug(dbName_not_right);
 		return FAIL;
 	}
+<<<<<<< HEAD
 //	cout << "aaaa" << endl;
+=======
+	cout << "aaaa" << endl;
+>>>>>>> 5fb5233fe7c02d410ae870c864bbca769ca21344
 	rmm.OpenFile("attrcat", attrfh);
 	int fileID = attrfh.getFileID();
 //	cout << "fileID " << fileID << endl;
@@ -138,7 +142,11 @@ int SM_Manager::CreateTable (const char *relName,                // 创建表, 这里
 	rmm.OpenFile("tablelist", tablefh);
 	TableInfo tbinfo;
 	strcpy(tbinfo.tableName, relName);
+<<<<<<< HEAD
 //	cout << "CreateTable: " << tbinfo.tableName << endl;
+=======
+	cout << "CreateTable: " << tbinfo.tableName << endl;
+>>>>>>> 5fb5233fe7c02d410ae870c864bbca769ca21344
 	tablefh.InsertRec((char*)&tbinfo, rid);
 	rmm.CloseFile(tablefh);
 //	rmm.CreateFile(relName, size);
@@ -234,7 +242,11 @@ int SM_Manager::GetTable (const char *readRelName, int &number, DataAttrInfo* &d
 		dataInfo[number].copy(mydata);
 		number++;
 	}
+<<<<<<< HEAD
 	cout << "Table End" << endl;
+=======
+//	cout << "Table End" << endl;
+>>>>>>> 5fb5233fe7c02d410ae870c864bbca769ca21344
 	rfs.CloseScan();
 	rmm.CloseFile(attrfh);
 	return 0;

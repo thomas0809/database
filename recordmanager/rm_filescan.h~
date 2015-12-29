@@ -128,14 +128,17 @@ public:	bool condINT(int v1, int v2){
 					v2[attrLength] = '\0';
 //					cout << "he" << endl;
 //					cout << "String compare: " << v1 << ' ' << v2 << endl;
+<<<<<<< HEAD
 					void* t1 = (void *)v1;
 					void* t2 = (void *)v2;
 //					cout << *(int*)t1 << ' ' <<  *(int*)t2 << endl;
+=======
+>>>>>>> 5fb5233fe7c02d410ae870c864bbca769ca21344
 //					for (int i = 0; i < attrLength; i++)
 //						cout << v1[i] << v2[i] << ' ';
 //					cout << endl;
 					if(CondSTRING(v1, v2)){
-						cout << "is equal" << endl; 
+//						cout << "is equal" << endl; 
 						return true;
 					}
 				}
@@ -177,8 +180,13 @@ public:	bool condINT(int v1, int v2){
     	this->value = value;
     	currentPage = 1;
     	currentRecord = 0;
+<<<<<<< HEAD
 //	cout << "========================" << endl;
 //	cout << this->compOp << compOp <<  endl;
+=======
+	cout << "========================" << endl;
+	cout << this->compOp << compOp <<  endl;
+>>>>>>> 5fb5233fe7c02d410ae870c864bbca769ca21344
 	if (this->compOp == 7)
 		return 1;
     	if(attrType < MyINT || attrType > STRING || compOp < EQ_OP || compOp > NO_OP) 

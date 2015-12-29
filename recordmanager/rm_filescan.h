@@ -39,6 +39,7 @@ public:	bool condINT(int v1, int v2){
 			case LE_OP: return v1 <= v2;
 			case GE_OP: return v1 >= v2;
 			case NE_OP: return v1 != v2;
+			case NO_OP: return true;
 			default: break;
 		}
 		return false;
@@ -52,6 +53,7 @@ public:	bool condINT(int v1, int v2){
 			case LE_OP: return v1 <= v2;
 			case GE_OP: return v1 >= v2;
 			case NE_OP: return v1 != v2;
+			case NO_OP: return true;
 			default: break;
 		}
 		return false;
