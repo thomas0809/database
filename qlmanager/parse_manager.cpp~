@@ -331,13 +331,13 @@ void Parse_Manager::readInsertData(char* relName, int nattr, AttrInfo* attrs){
 }
 
 
-void Parse_Manager::MainLoop(SM_Manager *smm, RM_Manager *rmm) {
+void Parse_Manager::MainLoop(SM_Manager *smm, RM_Manager *rmm, IX_Manager *ixm) {
 
 	string instruction = string("python parser.py ") + filename + string("> tmp");
 	system(instruction.c_str());
 
 	fp = fopen("tmp.gen", "r");
-	ql_manager = new QL_Manager(smm, rmm);
+	ql_manager = new QL_Manager(smm, rmm, ixm);
 
 	char cmd[256];
 	int a = 1;
@@ -400,21 +400,38 @@ void Parse_Manager::MainLoop(SM_Manager *smm, RM_Manager *rmm) {
 				int ntype;
 				fscanf(fp, "%d", &ntype);
 				cout << check_attr << ' ' << ntype << endl;
+				AttrType attrType;
+				int attrLength;
 				Value* value = new Value[ntype];
 				for(int i = 0; i < ntype; i++) {
 					fscanf(fp, "%d", &value[i].type);
 					if (value[i].type == MyINT){
 						readInt(value[i].data);
+						attrType = MyINT;
+						attrLength = 4;
 					}
 					else if(value[i].type == FLOAT){
 						readFloat(value[i].data);
+						attrType = FLOAT;
+						attrLength = 4;
 					}
 					else{
 						readString(value[i].data);
+						attrType = STRING;
+						attrLength = 1024;
 					}
-
 					cout << value[i];
 				}
+				char checkname[512];
+				memset(checkname, 0, sizeof checkname);
+				sprintf(checkname, "%s.check", check_attr);
+				ixm->CreateIndex(relName, checkname, attrType, attrLength);
+				IX_IndexHandle ixh;
+				ixm->OpenIndex(relName, checkname, ixh);
+				for (int i = 0; i < ntype; i++) {
+					ixh.InsertEntry(value[i].data, RID(i, 0));
+				}
+				ixm->CloseIndex(ixh);
 			}
 			else if(strcmp(temp, "nocheck") == 0) {
 				cout << "nocheck" << endl;
@@ -426,7 +443,10 @@ void Parse_Manager::MainLoop(SM_Manager *smm, RM_Manager *rmm) {
 			for (int i = 0; i < attrCount; i++){
 				memset(attributes[i].attrName, 0, MAXNAME+1);
 				fscanf(fp, "%s %d %d %d", attributes[i].attrName, &attributes[i].attrType, &attributes[i].attrLength, &attributes[i].notNull);
-				if(strcmp(attributes[i].attrName, pk) == 0) attributes[i].primaryKey = 1;
+				if(strcmp(attributes[i].attrName, pk) == 0) {
+					attributes[i].primaryKey = 1;
+					ixm->CreateIndex(relName, attributes[i].attrName, attributes[i].attrType, attributes[i].attrLength);
+				}
 			}
 			AttrInfo *x = new AttrInfo[attrCount];
 			for (int i = 0; i < attrCount; i++)
@@ -439,12 +459,40 @@ void Parse_Manager::MainLoop(SM_Manager *smm, RM_Manager *rmm) {
 			char *relName = readName();
 			char *attrName = readName();
 			cout << relName << ' ' << attrName << endl;
+			int attrNum;
+			DataAttrInfo* attrs;
+			smm->GetTable(relName, attrNum, attrs);
+			for (int i = 0; i < attrNum; i++)
+				if (strcmp(attrs[i].attrName, attrName) == 0) {
+					//printf("createindex attrName : %s  attrLength : %d  attroffset : %d\n", attrs[i].attrName, attrs[i].attrLength, attrs[i].offset);
+					if (ixm->CreateIndex(relName, attrName, attrs[i].attrType, attrs[i].attrLength) == -1)
+						break;
+					IX_IndexHandle ixh;
+					ixm->OpenIndex(relName, attrName, ixh);
+					RM_FileHandle relfh;
+					rmm->OpenFile(relName, relfh);
+					RM_FileScan scan(rmm->getFileManager(), rmm->getBufPageManager());
+					scan.OpenScan(relfh, attrs[i].attrType, attrs[i].attrLength, 0, NO_OP, (void*)0);
+					int cnt = 0;
+					while (true) {
+						RM_Record rec;
+						if (scan.GetNextRec(rec) == -1)
+							break;
+						ixh.InsertEntry(rec.data + attrs[i].offset, rec.rid);
+						//printf("%d %s  %lld\n", cnt++, rec.data + attrs[i].offset, (long long)(rec.data));
+					}
+					//printf("\n");
+					rmm->CloseFile(relfh);
+					ixm->CloseIndex(ixh);
+					break;
+				}
 		}
 
 		else if(strcmp(cmd, "dropindex") == 0) { //DROP INDEX customer(name);
 			char *relName = readName();
 			char *attrName = readName();
 			cout << relName << ' ' << attrName << endl;
+			ixm->DestroyIndex(relName, attrName);
 		}
 
 		else if(strcmp(cmd, "insert") == 0){
@@ -556,7 +604,9 @@ cout << nrela << endl;
 					int ncond = 0;
 					Condition* cond;
 					readWhere(ncond, cond);
-					ql_manager->Select(nattrs, attr, nrela, rela, 0, ncond, cond, attr[0]);
+RelAttr gattr;
+ql_manager->Select(0,NULL,0,NULL,0,0,NULL,gattr);
+					//ql_manager->Select(nattrs, attr, nrela, rela, 0, ncond, cond, attr[0]);
 				}
 			}
 			else if(strcmp(temp, "group") == 0) {

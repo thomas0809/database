@@ -1,3 +1,11 @@
 USE orderDB;
-DELETE FROM customer WHERE customer.id = 3000001;
-
+INSERT INTO customer VALUES (300001, 'CHAD DA CABELLO', 'F');
+INSERT INTO orders VALUES (315000,200001,'eight');
+SELECT * FROM publisher WHERE state='CA';
+DELETE FROM publisher WHERE state='CA';
+SELECT * FROM book WHERE authors = 'Anthony Boucher';
+UPDATE book SET title='Nine Times Nine' WHERE authors='Anthony Boucher';
+SELECT * FROM book WHERE authors = 'Anthony Boucher';
+SELECT MIN(id) FROM book WHERE id < 200100;
+SELECT book.title FROM book wHERE authors like '%nth%';
+SELECT book.title,orders.quantity FROM book,orders wHERE book.id = orders.book_id AND orders.quantity > 8;

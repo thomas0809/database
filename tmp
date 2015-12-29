@@ -1,6 +1,52 @@
 USE orderDB
 11
-DELETE FROM customer WHERE customer.id = 3000001
+INSERT INTO customer VALUES (300001, 'CHAD DA CABELLO', 'F')
+4
+cmd insert
+('Table name ', 'customer')
+INSERT INTO orders VALUES (315000,200001,'eight')
+4
+cmd insert
+('Table name ', 'orders')
+SELECT * FROM publisher WHERE state='CA'
+7
+cmd select
+*
+('Table name ', 'publisher')
+DELETE FROM publisher WHERE state='CA'
 5
 cmd delete
-('Table name ', 'customer')
+('Table name ', 'publisher')
+SELECT * FROM book WHERE authors = 'Anthony Boucher'
+7
+cmd select
+*
+('Table name ', 'book')
+UPDATE book SET title='Nine Times Nine' WHERE authors='Anthony Boucher'
+6
+cmd update
+('Table name ', 'book')
+SELECT * FROM book WHERE authors = 'Anthony Boucher'
+7
+cmd select
+*
+('Table name ', 'book')
+SELECT MIN(id) FROM book WHERE id < 200100
+7
+cmd select
+MIN id
+('Table name ', 'book')
+SELECT book.title FROM book wHERE authors like '%nth%'
+7
+cmd select
+book.title
+["book wHERE authors like '%nth%'"]
+('Table name ', "book wHERE authors like '%nth%'")
+SELECT book.title,orders.quantity FROM book,orders wHERE book.id = orders.book_id AND orders.quantity > 8
+7
+cmd select
+book.title
+orders.quantity
+['book', 'orders wHERE book.id = orders.book_id AND orders.quantity > 8']
+('Table name ', 'book')
+('Table name ', 'orders wHERE book.id = orders.book_id AND orders.quantity > 8')

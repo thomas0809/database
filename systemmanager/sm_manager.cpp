@@ -186,23 +186,24 @@ int SM_Manager::ShowTable (const char *readRelName){
 	RM_FileScan rfs = RM_FileScan(rmm.getFileManager(), rmm.getBufPageManager());	
  	RM_Record rec;
 	int returnCode;
-	cout << "ShowTable" << endl;
+//	cout << "ShowTable" << endl;
 	rmm.OpenFile("attrcat", attrfh);
 	returnCode = rfs.OpenScan(attrfh, STRING, strlen(readRelName), 16, EQ_OP, (void*)readRelName);
 	int x = 0;
 //	cout << "TableName : "<< readRelName << endl;
+//	cout << "returnCode: " << returnCode << endl;
 	while (returnCode == 1){
 //		cout << "ret : 1" << endl;
 		x = rfs.GetNextRec(rec);
 //		cout << "ret : 2" << endl;
 		if (x == -1)
 			break;
-//		cout << x << endl;
+		cout << x << endl;
 		DataAttrInfo * mydata;
 		rec.GetData((char*&) mydata);
 		mydata->print();
 	}
-//	cout << "Table End" << endl;
+	cout << "Table End" << endl;
 	rfs.CloseScan();
 	rmm.CloseFile(attrfh);
 	return 0;

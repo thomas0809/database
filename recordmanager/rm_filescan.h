@@ -72,6 +72,22 @@ public:	bool condINT(int v1, int v2){
 		}
 		return false;
 	}
+
+	bool vagueEqual(char* v1, char* v2) {
+		FILE *fp = fopen("../vague", "w");
+		fprintf(fp, "%s\n%s", v1, v2);
+		fclose(fp);
+		string s1 = "python ../recordmanager/vague.py";
+		system(s1.c_str());
+
+		fp = fopen("../vague", "r");
+		int rval;
+		fscanf(fp, "%d", &rval);
+		fclose(fp);
+		if(rval == 1) return true;
+		return false;
+	}
+
 	bool findRecord(BufType b){
 		int totalRecord = 8088 >> 5;
 		PageHead* pagehead = (PageHead*)(b);
@@ -136,8 +152,12 @@ public:	bool condINT(int v1, int v2){
 //					for (int i = 0; i < attrLength; i++)
 //						cout << v1[i] << v2[i] << ' ';
 //					cout << endl;
-					if(CondSTRING(v1, v2)){
+					if(CondSTRING(v1, v2) && compOp != 6){
 //						cout << "is equal" << endl; 
+						return true;
+					}
+//					cout << "test" << endl;
+					if(compOp == 6 && vagueEqual(v1, v2)){
 						return true;
 					}
 				}
@@ -171,6 +191,8 @@ public:	bool condINT(int v1, int v2){
     	BufType b = bpm->getPage(fileID, 0, index);
     	recordSize = b[0];
     	pageNumber = b[1];
+//	cout << "recordSize" << b[0] << endl;
+//	cout << "pageNumber" << b[1] << endl;
     	this->fileID = fileHandle.getFileID();
     	this->attrType = attrType;
     	this->attrLength = attrLength;
@@ -195,6 +217,8 @@ public:	bool condINT(int v1, int v2){
     }
 
     int GetNextRec(RM_Record &rec){	 // Get next matching record
+//	cout << "la" << endl;
+//	cout << currentPage << ' ' << pageNumber << endl;
     	for(; currentPage <= pageNumber; currentPage++){
     		int index;
     		BufType b = bpm->getPage(fileID, currentPage, index);

@@ -39,6 +39,7 @@ public:	bool condINT(int v1, int v2){
 			case LE_OP: return v1 <= v2;
 			case GE_OP: return v1 >= v2;
 			case NE_OP: return v1 != v2;
+			case NO_OP: return true;
 			default: break;
 		}
 		return false;
@@ -52,6 +53,7 @@ public:	bool condINT(int v1, int v2){
 			case LE_OP: return v1 <= v2;
 			case GE_OP: return v1 >= v2;
 			case NE_OP: return v1 != v2;
+			case NO_OP: return true;
 			default: break;
 		}
 		return false;
@@ -70,6 +72,22 @@ public:	bool condINT(int v1, int v2){
 		}
 		return false;
 	}
+
+	bool vagueEqual(char* v1, char* v2) {
+		FILE *fp = fopen("../vague", "w");
+		fprintf(fp, "%s\n%s", v1, v2);
+		fclose(fp);
+		string s1 = "python ../recordmanager/vague.py";
+		//system(s1.c_str());
+
+		fp = fopen("../vague", "r");
+		int rval;
+		fscanf(fp, "%d", &rval);
+		fclose(fp);
+		if(rval == 1) return true;
+		return false;
+	}
+
 	bool findRecord(BufType b){
 		int totalRecord = 8088 >> 5;
 		PageHead* pagehead = (PageHead*)(b);
@@ -128,17 +146,18 @@ public:	bool condINT(int v1, int v2){
 					v2[attrLength] = '\0';
 //					cout << "he" << endl;
 //					cout << "String compare: " << v1 << ' ' << v2 << endl;
-<<<<<<< HEAD
 					void* t1 = (void *)v1;
 					void* t2 = (void *)v2;
 //					cout << *(int*)t1 << ' ' <<  *(int*)t2 << endl;
-=======
->>>>>>> 5fb5233fe7c02d410ae870c864bbca769ca21344
 //					for (int i = 0; i < attrLength; i++)
 //						cout << v1[i] << v2[i] << ' ';
 //					cout << endl;
-					if(CondSTRING(v1, v2)){
+					if(CondSTRING(v1, v2) && compOp != 6){
 //						cout << "is equal" << endl; 
+						return true;
+					}
+//					cout << "test" << endl;
+					if(compOp == 6 && vagueEqual(v1, v2)){
 						return true;
 					}
 				}
@@ -172,6 +191,8 @@ public:	bool condINT(int v1, int v2){
     	BufType b = bpm->getPage(fileID, 0, index);
     	recordSize = b[0];
     	pageNumber = b[1];
+//	cout << "recordSize" << b[0] << endl;
+//	cout << "pageNumber" << b[1] << endl;
     	this->fileID = fileHandle.getFileID();
     	this->attrType = attrType;
     	this->attrLength = attrLength;
@@ -180,13 +201,8 @@ public:	bool condINT(int v1, int v2){
     	this->value = value;
     	currentPage = 1;
     	currentRecord = 0;
-<<<<<<< HEAD
 //	cout << "========================" << endl;
 //	cout << this->compOp << compOp <<  endl;
-=======
-	cout << "========================" << endl;
-	cout << this->compOp << compOp <<  endl;
->>>>>>> 5fb5233fe7c02d410ae870c864bbca769ca21344
 	if (this->compOp == 7)
 		return 1;
     	if(attrType < MyINT || attrType > STRING || compOp < EQ_OP || compOp > NO_OP) 
@@ -201,6 +217,8 @@ public:	bool condINT(int v1, int v2){
     }
 
     int GetNextRec(RM_Record &rec){	 // Get next matching record
+//	cout << "la" << endl;
+//	cout << currentPage << ' ' << pageNumber << endl;
     	for(; currentPage <= pageNumber; currentPage++){
     		int index;
     		BufType b = bpm->getPage(fileID, currentPage, index);

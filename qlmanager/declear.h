@@ -197,7 +197,7 @@ class QL_Manager {
         }
         }
         rfs.CloseScan();
-            rmm->CloseFile(attrfh);
+        rmm->CloseFile(attrfh);
         
             if (SelectPoint != 0){
         cout << "new SelAttrs" << newSelAttrs << endl;
@@ -206,7 +206,12 @@ class QL_Manager {
         cout << "Start print attrName: " << endl;
         for (int i = 0; i < nSelAttrs; i++)
         cout << getAttr[i].attrName << ' ' <<getAttr[i].offset << endl;
-        
+        double* p = new double[nSelAttrs];
+	int all = 0;
+	int use = 0;
+	for (int i = 0; i < nSelAttrs; i++){
+		p[i] = 0;	
+	}
         //get record
         cout << "ALL RECORD========= (0_0)=========" << endl;
             for (int i = 0; i < nrid; i++){
@@ -237,22 +242,88 @@ class QL_Manager {
 //          cout << endl;
                         if (getAttr[j].attrType == MyINT){
                              int* t = (int*)buf;
-                             cout << *t;
+			    if (selAttrs[j].type == NONE){
+			    	cout << *t;
+			    }
+			    if (selAttrs[j].type == SUM){
+			    	p[j] = p[j] + (double)*t;
+				cout << p[j];
+			    }
+			    if (selAttrs[j].type == AVG){
+				p[j] = p[j] + (double)*t;
+				all++;
+			    }
+			    if (selAttrs[j].type == 3){
+				if (use == 0){
+					p[j] = (double)*t;
+					use++;
+				}
+				else {if (p[j] > *t)
+					p[j] = (double)*t;
+
+				}
+			    }
+			    if (selAttrs[j].type == 4){
+				if (use == 0){
+					p[j] = (double)*t;
+					use++;
+				}
+				else{ if ((int)p[j] < (*t))
+					p[j] = (double)*t;
+				}
+			    }
             }
                         else if (getAttr[j].attrType == FLOAT){
-                 float* t = (float*)buf;
-                             cout << *t;
+                 	    float* t = (float*)buf;
+   			    if (selAttrs[j].type == NONE){
+			    	cout << *t;
+			    }
+			    if (selAttrs[j].type == SUM){
+			    	p[j] = p[j] + (double)*t;
+			    }
+			    if (selAttrs[j].type == AVG){
+				p[j] = p[j] + (double)*t;
+				all++;
+			    }
+			    if (selAttrs[j].type == MIN){
+				if (use == 0){
+					p[j] = (double)*t;
+					use++;
+				}
+				else if ((float)p[j] > (*t))
+					p[j] = (double)*t;
+			    }
+			    if (selAttrs[j].type == MAX){
+				if (use == 0){
+					p[j] = (double)*t;
+					use++;
+				}
+				else if (p[j] < (double)(*t))
+					p[j] = (double)*t;
+			    }
+	
             }
                         if (getAttr[j].attrType == STRING){
                              char* t = buf;
-			     cout << t;
+			    if (selAttrs[j].type == NONE){
+			    	cout << *t;
+			    }
 			}
                         cout << ", ";
 		}
 		cout << endl;
 		rmm->CloseFile(attrfh);
-            }
+            };
+	    for (int j = 0; j < nSelAttrs; j++){
+		cout << selAttrs[j].type << endl;
+		if (selAttrs[j].type == MIN || selAttrs[j].type == MAX || selAttrs[j].type == SUM)
+		      cout << getAttr[j].attrName << ": " << p[j] << endl;
+		if (selAttrs[j].type == AVG){
+		      cout << getAttr[j].attrName << ": " << (p[j]/(double)all) << endl;
+		}
+	    }
 	    delete []getAttr;
+	    delete []p;
             cout << "-----------END PRINT-----------" << endl;
         }
 
@@ -268,7 +339,7 @@ class QL_Manager {
         {
         cout << "shabi" << endl;
             cout << "QL Select Function" << endl;
-   /*       cout << "NSelAttr : " << nSelAttrs << endl;
+          cout << "NSelAttr : " << nSelAttrs << endl;
             for(int i = 0; i < nSelAttrs; i++) {
                 cout << selAttrs[i].type << ' ' << (selAttrs[i].relName == NULL) << ' ' << selAttrs[i].attrName;
 		if (selAttrs[i].relName != NULL){
@@ -290,7 +361,7 @@ class QL_Manager {
                 for(int i = 0; i < nConditions; i++) {
                     cout << conditions[i].lhsAttr.attrName << ' ' << conditions[i].op << endl;
                 }
-            }*/
+            }
 
   	    RM_FileScan rfs = RM_FileScan(rmm->getFileManager(), rmm->getBufPageManager());
 	    RM_FileHandle attrfh;
@@ -477,10 +548,11 @@ class QL_Manager {
 		    return;
 		}
 	    }
-//	    cout << "========================" << endl;
-//	    for (int i = 0; i < nConditions; i++){
-//		cout << "i: " << i << ' ' << leftRel[i] << ' ' << rightRel[i] << endl;
-//	    }
+/*	    cout << "========================" << endl;
+	   cout << nConditions << endl;
+	    for (int i = 0; i < nConditions; i++){
+		cout << "i: " << i << ' ' << leftRel[i] << ' ' << rightRel[i] << endl;
+	    }*/
 	    //get All Rid
             RID **rid = new RID*[MAXRELATION];
             for(int i = 0;i < MAXRELATION; i++)
@@ -608,8 +680,8 @@ class QL_Manager {
 				length = sizeof(float);
 			    else
 				length = right[i].attrLength;
-			    memcpy(buf, temp + right[i].offset, length);
-			    char t = *(char*)(temp + right[i].offset);
+			    memcpy(buf, (char*)temp + right[i].offset, length);
+			    char t = *(char*)((char*)temp + right[i].offset);
 			    // if is null
 			    if (t == 0){
 				inCondition = 0;
@@ -683,8 +755,8 @@ class QL_Manager {
 		 	    length = sizeof(float);
 			else
 			    length = right[i].attrLength;
-			memcpy(buf, temp + right[i].offset, length);
-			char t = *(char*)(temp + right[i].offset);
+			memcpy(buf, (char*)temp + right[i].offset, length);
+			char t = *(char*)((char*)temp + right[i].offset);
 			//filescan only need conditions[i].op
 			rfs.OpenScan(attrfh, STRING, strlen(left[i].relName), 16, conditions[i].op, (void*)left[i].relName);
 			if (conditions[i].op == 7){
@@ -754,7 +826,7 @@ class QL_Manager {
 				length = sizeof(float);
 			else
 				length = getAttr[i].attrLength;
-			memcpy(buf, temp + getAttr[i].offset, length);
+			memcpy(buf, (char*)temp + getAttr[i].offset, length);
 //			cout << "buf: ";
 //			for (int k = 0; k < 10; k++)
 //				cout << buf[k];
@@ -852,7 +924,7 @@ class QL_Manager {
         
 //      cout << "debug: 1" << endl;
             smm->GetTable(relName, countAttr, dataInfo);
-//      cout << "countAttr: " << countAttr << endl;
+      	cout << "countAttr: " << countAttr << endl;
             cout << dataInfo[0].attrLength << endl;
             //insert into Table, check value type
 
@@ -1115,9 +1187,9 @@ class QL_Manager {
         cout << returnCode << endl;
         RM_Record rec_1;
         while (returnCode == 1) {
-//      cout << "ret : 1" << endl;
+   //         cout << "ret : 1" << endl;
             x = rfs.GetNextRec(rec_1);
-//      cout << "ret : 2" << endl;
+   //         cout << "ret : 2" << endl;
             if (x == -1)
                 break;
 //      cout << x << endl;
@@ -1135,10 +1207,11 @@ class QL_Manager {
 //      delete []t;
             rec_1.GetRid(tempRid);
             rid[nrid].Copy(tempRid);
-            cout << rid[nrid] << endl;
+      //    cout << rid[nrid] << endl;
             nrid++;
 //      cout << "get Rid: " << tempRid << endl;
         }
+	cout << "all: " << nrid << endl;
         rfs.CloseScan();
         rmm->CloseFile(attrfh);
             cout << "END SEARCH" << endl;

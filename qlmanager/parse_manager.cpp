@@ -604,9 +604,9 @@ cout << nrela << endl;
 					int ncond = 0;
 					Condition* cond;
 					readWhere(ncond, cond);
-RelAttr gattr;
-ql_manager->Select(0,NULL,0,NULL,0,0,NULL,gattr);
-					//ql_manager->Select(nattrs, attr, nrela, rela, 0, ncond, cond, attr[0]);
+//RelAttr gattr;
+//ql_manager->Select(0,NULL,0,NULL,0,0,NULL,gattr);
+					ql_manager->Select(nattrs, attr, nrela, rela, 0, ncond, cond, attr[0]);
 				}
 			}
 			else if(strcmp(temp, "group") == 0) {
