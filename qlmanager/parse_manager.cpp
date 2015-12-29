@@ -400,28 +400,13 @@ void Parse_Manager::MainLoop(SM_Manager *smm, RM_Manager *rmm, IX_Manager *ixm) 
 				int ntype;
 				fscanf(fp, "%d", &ntype);
 				cout << check_attr << ' ' << ntype << endl;
-<<<<<<< HEAD
-=======
 				AttrType attrType;
 				int attrLength;
->>>>>>> 5fb5233fe7c02d410ae870c864bbca769ca21344
 				Value* value = new Value[ntype];
 				for(int i = 0; i < ntype; i++) {
 					fscanf(fp, "%d", &value[i].type);
 					if (value[i].type == MyINT){
 						readInt(value[i].data);
-<<<<<<< HEAD
-					}
-					else if(value[i].type == FLOAT){
-						readFloat(value[i].data);
-					}
-					else{
-						readString(value[i].data);
-					}
-
-					cout << value[i];
-				}
-=======
 						attrType = MyINT;
 						attrLength = 4;
 					}
@@ -447,7 +432,6 @@ void Parse_Manager::MainLoop(SM_Manager *smm, RM_Manager *rmm, IX_Manager *ixm) 
 					ixh.InsertEntry(value[i].data, RID(i, 0));
 				}
 				ixm->CloseIndex(ixh);
->>>>>>> 5fb5233fe7c02d410ae870c864bbca769ca21344
 			}
 			else if(strcmp(temp, "nocheck") == 0) {
 				cout << "nocheck" << endl;

@@ -46,12 +46,7 @@ SM_Manager::~SM_Manager(){
 }
 
 int SM_Manager::CreateDb (const char *dbName){
-<<<<<<< HEAD
-	char command[80] = "./create ";
-//	char command[80] = "create ";
-=======
 	char command[80] = "mkdir ";
->>>>>>> 5fb5233fe7c02d410ae870c864bbca769ca21344
 	system(strcat(command, dbName));
 	chdir(dbName);
 	cout << sizeof(DataAttrInfo) << endl;
@@ -114,11 +109,7 @@ int SM_Manager::CreateTable (const char *relName,                // 创建表, 这里
 		myLog->LogDebug(dbName_not_right);
 		return FAIL;
 	}
-<<<<<<< HEAD
 //	cout << "aaaa" << endl;
-=======
-	cout << "aaaa" << endl;
->>>>>>> 5fb5233fe7c02d410ae870c864bbca769ca21344
 	rmm.OpenFile("attrcat", attrfh);
 	int fileID = attrfh.getFileID();
 //	cout << "fileID " << fileID << endl;
@@ -146,11 +137,7 @@ int SM_Manager::CreateTable (const char *relName,                // 创建表, 这里
 	rmm.OpenFile("tablelist", tablefh);
 	TableInfo tbinfo;
 	strcpy(tbinfo.tableName, relName);
-<<<<<<< HEAD
 //	cout << "CreateTable: " << tbinfo.tableName << endl;
-=======
-	cout << "CreateTable: " << tbinfo.tableName << endl;
->>>>>>> 5fb5233fe7c02d410ae870c864bbca769ca21344
 	tablefh.InsertRec((char*)&tbinfo, rid);
 	rmm.CloseFile(tablefh);
 //	rmm.CreateFile(relName, size);
@@ -227,11 +214,7 @@ int SM_Manager::GetTable (const char *readRelName, int &number, DataAttrInfo* &d
 	RM_FileScan rfs = RM_FileScan(rmm.getFileManager(), rmm.getBufPageManager());	
  	RM_Record rec;
 	int returnCode;
-<<<<<<< HEAD
 //	cout << "GetTable" << endl;
-=======
-	cout << "GetTable" << endl;
->>>>>>> 5fb5233fe7c02d410ae870c864bbca769ca21344
 	rmm.OpenFile("attrcat", attrfh);
 	returnCode = rfs.OpenScan(attrfh, STRING, strlen(readRelName), 16, EQ_OP, (void*)readRelName);
 	int x = 0;
