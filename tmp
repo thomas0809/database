@@ -10,64 +10,12 @@ CREATE DATABASE qby
 9
 USE qby
 11
-<<<<<<< HEAD
-INSERT INTO customer VALUES (300001, 'CHAD DA CABELLO', 'F')
-4
-cmd insert
-('Table name ', 'customer')
-INSERT INTO orders VALUES (315000,200001,'eight')
-4
-cmd insert
-('Table name ', 'orders')
-SELECT * FROM publisher WHERE state='CA'
-7
-cmd select
-*
-('Table name ', 'publisher')
-DELETE FROM publisher WHERE state='CA'
-5
-cmd delete
-('Table name ', 'publisher')
-SELECT * FROM book WHERE authors = 'Anthony Boucher'
-7
-cmd select
-*
-('Table name ', 'book')
-UPDATE book SET title='Nine Times Nine' WHERE authors='Anthony Boucher'
-6
-cmd update
-('Table name ', 'book')
-SELECT * FROM book WHERE authors = 'Anthony Boucher'
-7
-cmd select
-*
-('Table name ', 'book')
-SELECT MIN(id) FROM book WHERE id < 200100
-7
-cmd select
-MIN id
-('Table name ', 'book')
-SELECT book.title FROM book wHERE authors like '%nth%'
-7
-cmd select
-book.title
-["book wHERE authors like '%nth%'"]
-('Table name ', "book wHERE authors like '%nth%'")
-SELECT book.title,orders.quantity FROM book,orders wHERE book.id = orders.book_id AND orders.quantity > 8
-7
-cmd select
-book.title
-orders.quantity
-['book', 'orders wHERE book.id = orders.book_id AND orders.quantity > 8']
-('Table name ', 'book')
-('Table name ', 'orders wHERE book.id = orders.book_id AND orders.quantity > 8')
-=======
-CREATE TABLE book(id int(10),name varchar(50),author varchar(200), day int(5),month int(5),year int(5), PRIMARY KEY(id))
+CREATE TABLE book(id int(10),name varchar(50),author varchar(200), day int(5),month int(5),year int(5), CHECK (id in (200001,200002,200003,200004,200005,200006,200007,200008,200009,200010,200011,200012,200013,200014,200015,200016,200017,200018,200019,200020)), PRIMARY KEY(id))
 3
 cmd create table
 ('Table name ', 'book')
 ('Primary key ', 'id')
-year int(5)
+CHECK (id in (200001,200002,200003,200004,200005,200006,200007,200008,200009,200010,200011,200012,200013,200014,200015,200016,200017,200018,200019,200020))
 ('Col name ', 'id')
 ('Col type ', 'int')
 ('Col leng ', '10')
@@ -173,7 +121,7 @@ book_id int(10)
 ('Col type ', 'int')
 ('Col leng ', '10')
 ('Col null ', '0')
-INSERT INTO order VALUES (12345,'Marias Diary',200960)
+INSERT INTO order VALUES  (1,'Marias Diary',200001), (2,'AAAAAAAAAAAA',200002), (3,'BAAAAAAAAAAA',200003), (4,'CAAAAAAAAAAA',200004), (5,'DAAAAAAAAAA',200005), (6,'EAAAAAAAAAAA',200006), (7,'FAAAAAAAAAAA',200007), (8,'GAAAAAAAAAAA',200008), (9,'HAAAAAAAAAA',200009), (10,'IAAAAAAAAAAA',200010), (11,'JAAAAAAAAAAA',200011), (12,'KAAAAAAAAAAA',200012), (13,'LAAAAAAAAAAA',200013), (14,'MAAAAAAAAAAA',200014), (15,'NAAAAAAAAAAA',200015), (16,'OAAAAAAAAAAA',200016), (17,'PAAAAAAAAAAA',200017), (18,'QAAAAAAAAAAA',200018), (19,'RAAAAAAAAAAA',200019), (20,'SAAAAAAAAAAA',200020)
 4
 cmd insert
 ('Table name ', 'order')
@@ -181,7 +129,7 @@ UPDATE order SET book_id=829478 WHERE name='Marias Diary'
 6
 cmd update
 ('Table name ', 'order')
-SELECT id, name, book_id FROM order WHERE name>'A'
+SELECT id, name, book_id FROM order WHERE name>'B'
 7
 cmd select
 id
@@ -194,15 +142,29 @@ cmd select
 id
  name
 ('Table name ', 'book')
-UPDATE order SET book_id=200955 WHERE name='Marias Diary'
+UPDATE order SET book_id=200010 WHERE name='Marias Diary'
 6
 cmd update
 ('Table name ', 'order')
-SELECT id, name, book_id FROM order WHERE name>'A'
+SELECT id, name, book_id FROM order WHERE name>'B'
 7
 cmd select
 id
  name
  book_id
 ('Table name ', 'order')
->>>>>>> a34396a0e4bd46efac8e83971659504c4e5779c7
+SELECT * FROM book WHERE author like '%David%'
+7
+cmd select
+*
+('Table name ', 'book')
+SELECT * FROM book WHERE id = 200001 OR (id > 200003 AND id < 200007) OR (author='Julia Oliver')
+7
+cmd select
+*
+('Table name ', 'book')
+SELECT AVG(year) FROM book WHERE id < 200003
+7
+cmd select
+AVG year
+('Table name ', 'book')

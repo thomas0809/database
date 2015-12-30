@@ -205,7 +205,7 @@ class QL_Manager {
         }
         cout << "Start print attrName: " << endl;
         for (int i = 0; i < nSelAttrs; i++)
-        cout << getAttr[i].attrName << ' ' <<getAttr[i].offset << endl;
+        cout << getAttr[i].attrName << ' ' <<getAttr[i].offset << " length " << getAttr[i].attrLength << endl;
         double* p = new double[nSelAttrs];
 	int all = 0;
 	int use = 0;
@@ -306,7 +306,7 @@ class QL_Manager {
                         if (getAttr[j].attrType == STRING){
                              char* t = buf;
 			    if (selAttrs[j].type == NONE){
-			    	cout << *t;
+			    	cout << t;
 			    }
 			}
                         cout << ", ";
@@ -1156,7 +1156,7 @@ class QL_Manager {
         //cout << "attrLength: " << attrLength << endl;
         //cout << "attrOffset: " << attrOffset << endl;
 
-        if (cond->op != NULL_OP) {
+        if (cond->op != NULL_OP && cond->op != LIKE_OP) {
             char buf[100];
             memset(buf, 0, sizeof buf);
             sprintf(buf, "%s.%s.index", relName, cond->lhsAttr.attrName);
