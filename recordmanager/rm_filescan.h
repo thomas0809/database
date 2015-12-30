@@ -96,7 +96,7 @@ public:	bool condINT(int v1, int v2){
 			bool isRecord = pagehead->getRecordHead(currentRecord);
 			if(isRecord){
 				// NULL return false
-				//cout << "compOp: " << compOp << endl;
+				//cout << "compOp: ---" << compOp << endl;
 				//if (compOp == 7)
 				//	cout << "hahaha " << indexNo << ' ' << recordSize << endl;
 				int offset_1 = 96 + currentRecord * recordSize + indexNo;
@@ -202,7 +202,7 @@ public:	bool condINT(int v1, int v2){
     	currentPage = 1;
     	currentRecord = 0;
 //	cout << "========================" << endl;
-//	cout << this->compOp << compOp <<  endl;
+	cout << this->compOp << compOp <<  endl;
 	if (this->compOp == 7)
 		return 1;
     	if(attrType < MyINT || attrType > STRING || compOp < EQ_OP || compOp > NO_OP) 

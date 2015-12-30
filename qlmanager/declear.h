@@ -214,6 +214,7 @@ class QL_Manager {
 	}
         //get record
         cout << "ALL RECORD========= (0_0)=========" << endl;
+	FILE *fp = fopen("../output.csv", "a");
             for (int i = 0; i < nrid; i++){
                 rmm->OpenFile(relName, attrfh);
         RM_Record tempRec;
@@ -223,9 +224,11 @@ class QL_Manager {
         temp = tempRec.data;
 //      for (int i = 0; i < strlen(temp); i++)
 //          cout << temp[i];
+		fprintf(fp, "result\t");
                 for (int j = 0; j < nSelAttrs; j++){
-//          cout << selAttrs[j].attrName << ' ' << getAttr[j].offset << ' ';
+//	    cout << getAttr[j].attrName << ": " << getAttr[j].offset << ' ';
             cout << getAttr[j].attrName << ": ";
+//	    fprintf(fp, "%s\t", getAttr[j].attrName);
             char* buf = new char[MAXATTRLENGTH];
             memset(buf, 0, MAXATTRLENGTH);
             int length = 0;
@@ -236,24 +239,29 @@ class QL_Manager {
             else
                 length = getAttr[j].attrLength;
             memcpy(buf, temp + getAttr[j].offset, length);
-//          cout << "buf: ";
-//          for (int k = 0; k < 10; k++)
-//              cout << buf[k];
-//          cout << endl;
+        //  cout << "buf: ";
+        //  for (int k = 0; k < 10; k++)
+        //      cout << buf[k];
+        //  cout << endl;
                         if (getAttr[j].attrType == MyINT){
                              int* t = (int*)buf;
-			    if (selAttrs[j].type == NONE){
-			    	cout << *t;
+			    if (SelectPoint != 0){
+				cout << *t;
+				fprintf(fp, "%d\t", *t);
 			    }
-			    if (selAttrs[j].type == SUM){
+			    else if (selAttrs[j].type == NONE){
+			    	cout << *t;
+				fprintf(fp, "%d\t", *t);
+			    }
+			    else if (selAttrs[j].type == SUM){
 			    	p[j] = p[j] + (double)*t;
 				cout << p[j];
 			    }
-			    if (selAttrs[j].type == AVG){
+			    else if (selAttrs[j].type == AVG){
 				p[j] = p[j] + (double)*t;
 				all++;
 			    }
-			    if (selAttrs[j].type == 3){
+			    else if (selAttrs[j].type == 3){
 				if (use == 0){
 					p[j] = (double)*t;
 					use++;
@@ -263,7 +271,7 @@ class QL_Manager {
 
 				}
 			    }
-			    if (selAttrs[j].type == 4){
+			    else if (selAttrs[j].type == 4){
 				if (use == 0){
 					p[j] = (double)*t;
 					use++;
@@ -275,17 +283,22 @@ class QL_Manager {
             }
                         else if (getAttr[j].attrType == FLOAT){
                  	    float* t = (float*)buf;
-   			    if (selAttrs[j].type == NONE){
-			    	cout << *t;
+			    if (SelectPoint != 0){
+				cout << *t;
+				fprintf(fp, "%f\t", *t);
 			    }
-			    if (selAttrs[j].type == SUM){
+   			    else if (selAttrs[j].type == NONE){
+			    	cout << *t;
+				fprintf(fp, "%f\t", *t);
+			    }
+			    else if (selAttrs[j].type == SUM){
 			    	p[j] = p[j] + (double)*t;
 			    }
-			    if (selAttrs[j].type == AVG){
+			    else if (selAttrs[j].type == AVG){
 				p[j] = p[j] + (double)*t;
 				all++;
 			    }
-			    if (selAttrs[j].type == MIN){
+			    else if (selAttrs[j].type == MIN){
 				if (use == 0){
 					p[j] = (double)*t;
 					use++;
@@ -293,7 +306,7 @@ class QL_Manager {
 				else if ((float)p[j] > (*t))
 					p[j] = (double)*t;
 			    }
-			    if (selAttrs[j].type == MAX){
+			    else if (selAttrs[j].type == MAX){
 				if (use == 0){
 					p[j] = (double)*t;
 					use++;
@@ -305,23 +318,33 @@ class QL_Manager {
             }
                         if (getAttr[j].attrType == STRING){
                              char* t = buf;
-			    if (selAttrs[j].type == NONE){
-			    	cout << *t;
+		            if (SelectPoint != 0){
+				cout << t;
+				fprintf(fp, "%s\t", t);
+			    }
+			    else if (selAttrs[j].type == NONE){
+			    	cout << t;
+				fprintf(fp, "%s\t", t);
 			    }
 			}
                         cout << ", ";
 		}
 		cout << endl;
+		fprintf(fp, "\n");
 		rmm->CloseFile(attrfh);
             };
 	    for (int j = 0; j < nSelAttrs; j++){
-		cout << selAttrs[j].type << endl;
-		if (selAttrs[j].type == MIN || selAttrs[j].type == MAX || selAttrs[j].type == SUM)
+	//	cout << selAttrs[j].type << endl;
+		if (selAttrs[j].type == MIN || selAttrs[j].type == MAX || selAttrs[j].type == SUM){
 		      cout << getAttr[j].attrName << ": " << p[j] << endl;
+		      fprintf(fp, "%s\t%f\n", getAttr[j].attrName, p[j]);
+		}
 		if (selAttrs[j].type == AVG){
 		      cout << getAttr[j].attrName << ": " << (p[j]/(double)all) << endl;
+		      fprintf(fp, "%s\t%f\n", getAttr[j].attrName, (p[j]/(double)all));
 		}
 	    }
+	    fclose(fp);
 	    delete []getAttr;
 	    delete []p;
             cout << "-----------END PRINT-----------" << endl;
@@ -329,15 +352,15 @@ class QL_Manager {
 
 
         void Select (int           nSelAttrs,        // # attrs in Select clause
-                   const RelAttr selAttrs[],       // attrs in Select clause
+                    RelAttr selAttrs[],       // attrs in Select clause
                    int           nRelations,       // # relations in From clause
-                   const char * const relations[], // relations in From clause
+                   char *  relations[], // relations in From clause
                    int           isGroup,
                    int           nConditions,      // # conditions in Where clause
-                   const Condition conditions[],  // conditions in Where clause
+                    Condition conditions[],  // conditions in Where clause
                    const RelAttr& groupAttr) 
         {
-        cout << "shabi" << endl;
+        //cout << "shabi" << endl;
             cout << "QL Select Function" << endl;
           cout << "NSelAttr : " << nSelAttrs << endl;
             for(int i = 0; i < nSelAttrs; i++) {
@@ -358,10 +381,14 @@ class QL_Manager {
             }
             else {
                 cout << "NCONDITIONS : " << nConditions << endl;
-                for(int i = 0; i < nConditions; i++) {
-                    cout << conditions[i].lhsAttr.attrName << ' ' << conditions[i].op << endl;
-                }
+ //               for(int i = 0; i < nConditions; i++) {
+ //                   cout << conditions[i].lhsAttr.attrName << ' ' << conditions[i].op << endl;
+ //               }
             }
+	    if (nRelations == 1){
+		for (int i = 0; i < nSelAttrs; i++)
+		    selAttrs[i].relName = relations[0];
+	    }
 
   	    RM_FileScan rfs = RM_FileScan(rmm->getFileManager(), rmm->getBufPageManager());
 	    RM_FileHandle attrfh;
@@ -371,6 +398,7 @@ class QL_Manager {
 		cout << "select *" << endl;
 		SelectPoint = 1;
             }
+
 	    if (SelectPoint == 0){
             for (int i = 0; i < nSelAttrs; i++){
 		if (selAttrs[i].relName == NULL){
@@ -438,10 +466,13 @@ class QL_Manager {
 		}
 	    }
 	    else{
+		cout << "1: " << endl;
+		cout << nRelations << endl;
 		for (int i = 0; i < nRelations; i++){
 			int x_0 = 0;
 			RM_Record selRec;
-			returnCode_0 = rfs.OpenScan(attrfh, STRING, strlen(selAttrs[i].relName), 16, EQ_OP, (void*)selAttrs[i].relName);
+			returnCode_0 = rfs.OpenScan(attrfh, STRING, strlen(relations[i]), 16, EQ_OP, (void*)relations[i]);
+			cout << "2: " << endl;
 			while (returnCode_0 == 1){
 				x_0 = rfs.GetNextRec(selRec);
 				if (x_0  == -1)
@@ -449,12 +480,7 @@ class QL_Manager {
 				DataAttrInfo *mydata;
 				selRec.GetData((char*&) mydata);
 				memcpy(&(getAttr[attrIndex]),mydata, sizeof(DataAttrInfo));
-				for (int j = 0; j < nRelations; j++){
-					if (strcmp(relations[j], selAttrs[i].relName) == 0){
-						attrOrder[attrIndex] = j;
-						break;
-					}
-				}
+				attrOrder[attrIndex] = i;
 				attrIndex++;
 			}
   			rfs.CloseScan();
@@ -493,7 +519,8 @@ class QL_Manager {
 	    }
 	    rfs.CloseScan();
             rmm->CloseFile(attrfh);
-	*/    
+	*/ 
+	    cout << "check " << endl;   
             if (SelectPoint != 0){
 //		cout << "new SelAttrs" << attrIndex << endl;
 		nSelAttrs = attrIndex;
@@ -503,11 +530,11 @@ class QL_Manager {
 //		cout << getAttr[i].relName << ' ' << getAttr[i].attrName << ' ' <<getAttr[i].offset << endl;
 ///==	    
 
-	    int* leftRel = new int[nConditions];
-	    int* rightRel = new int[nConditions];
+	    int* leftRel = new int[nConditions + 2];
+	    int* rightRel = new int[nConditions + 2];
 		
-	    memset(leftRel, 0, sizeof(int) * nConditions);
-	    memset(rightRel, 0, sizeof(int) * nConditions);
+	    memset(leftRel, 0, sizeof(int) * (nConditions + 2));
+	    memset(rightRel, 0, sizeof(int) * (nConditions + 2));
 	    for (int i = 0; i < nConditions; i++){
 		if (conditions[i].lhsAttr.relName == NULL){
 		    cout << "Select Error: need relation" << endl;
@@ -548,8 +575,8 @@ class QL_Manager {
 		    return;
 		}
 	    }
-/*	    cout << "========================" << endl;
-	   cout << nConditions << endl;
+//	    cout << "========================" << endl;
+/*	   cout << nConditions << endl;
 	    for (int i = 0; i < nConditions; i++){
 		cout << "i: " << i << ' ' << leftRel[i] << ' ' << rightRel[i] << endl;
 	    }*/
@@ -627,8 +654,8 @@ class QL_Manager {
 	    }
             rmm->CloseFile(attrfh);
 
-/*	    cout << "===========start print==========" << endl;
-	    for (int i = 0; i < nConditions; i++){
+	    cout << "===========start print==========" << endl;
+/*	    for (int i = 0; i < nConditions; i++){
 		cout << "left condition: " << left[i].relName << ' ' << left[i].attrName << "---op ---";
 	    	if (conditions[i].bRhsIsAttr){
 		    cout << "right condition:"  << right[i].relName << ' ' << right[i].attrName;
@@ -806,7 +833,7 @@ class QL_Manager {
 	    		rmm->CloseFile(attrfh);
 		    }
 		}	
-	
+		FILE *fp = fopen("../output.csv", "a");
 //====================================================================================================
 		if (inCondition == 1){
 		//  cout << "======================correct================== " << endl;
@@ -834,23 +861,27 @@ class QL_Manager {
                         if (getAttr[i].attrType == MyINT){
                              int* t = (int*)buf;
                              cout << *t;
+			     fprintf(fp, "%d\t", *t);
 			}
                         else if (getAttr[i].attrType == FLOAT){
 			     float* t = (float*)buf;
                              cout << *t;
+			     fprintf(fp, "%f\t", *t);
 			}
                         if (getAttr[i].attrType == STRING){
                              char* t = buf;
 			     cout << t;
+			     fprintf(fp, "%d\t", *t);
 			}
                         cout << ", ";
 			rfs.CloseScan();
 			rmm->CloseFile(attrfh);
 		    }
 		    cout << endl;
+		    fprintf(fp, "\n");
 //		    cout << "END PRINT in SELECT" << endl;
 		}
-
+		fclose(fp);
 //		for (int i = 0; i < nRelations; i++)
 //		    cout << number[i] << ' ';
 //		cout << endl;
@@ -1115,7 +1146,7 @@ class QL_Manager {
             AttrType attrType;
             int attrLength;
             int attrOffset;
-			int attrIndexNo;
+	    int attrIndexNo;
             int inRel = -1;
 
 //      cout << "debug: qby 2" << endl;
@@ -1152,6 +1183,10 @@ class QL_Manager {
         return;
         }
 
+	//cout << "attrType: " << attrType << endl;
+	//cout << "attrLength: " << attrLength << endl;
+	//cout << "attrOffset: " << attrOffset << endl;	 
+	//cout << "attrIndexNo: " << attrIndexNo << endl; 
         //cout << "attrType: " << attrType << endl;
         //cout << "attrLength: " << attrLength << endl;
         //cout << "attrOffset: " << attrOffset << endl;
@@ -1180,13 +1215,13 @@ class QL_Manager {
         }
 
         cout << "a" << endl;
-            returnCode = 0;
+           returnCode = 0;
         rmm->OpenFile(relName, attrfh);
-        for (int i = 0; i < 10; i++)
-            cout << *((char*)(cond->rhsValue.data)+ i) << ' ';
-        cout << endl;
-        returnCode = rfs.OpenScan(attrfh, attrType, attrLength, attrOffset, cond->op, cond->rhsValue.data);
-        cout << returnCode << endl;
+   //     for (int i = 0; i < 10; i++)
+   //         cout << *((char*)(cond->rhsValue.data)+ i) << ' ';
+   //      cout << endl;
+        returnCode = rfs.OpenScan(attrfh, attrType, attrLength, attrOffset, cond->op, cond->rhsValue.data, attrIndexNo);
+        cout << "Aaa" << returnCode << endl;
         RM_Record rec_1;
         while (returnCode == 1) {
    //         cout << "ret : 1" << endl;
