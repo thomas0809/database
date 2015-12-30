@@ -4,7 +4,8 @@ CREATE DATABASE qby;
 DROP DATABASE qby;
 CREATE DATABASE qby;
 USE qby;
-CREATE TABLE book(id int(10),name varchar(50),author varchar(200), day int(5),month int(5),year int(5), PRIMARY KEY(id));
+CREATE TABLE book(id int(10),name varchar(50),author varchar(200), day int(5),month int(5),year int(5), 
+CHECK (id in (200001,200002,200003,200004,200005,200006,200007,200008,200009,200010,200011,200012,200013,200014,200015,200016,200017,200018,200019,200020)), PRIMARY KEY(id));
 SHOW TABLES;
 SHOW book;
 CREATE INDEX book(name);
@@ -980,9 +981,31 @@ UPDATE book SET name='Nine Times Nine' WHERE author='Robert Asprin';
 SELECT id,name FROM book WHERE author='Robert Asprin';
 CREATE TABLE order(id int(10),name varchar(50), book_id int(10));
 INSERT INTO order VALUES 
-(12345,'Marias Diary',200960);
+ (1,'Marias Diary',200001),
+ (2,'AAAAAAAAAAAA',200002),
+ (3,'BAAAAAAAAAAA',200003),
+ (4,'CAAAAAAAAAAA',200004),
+ (5,'DAAAAAAAAAA',200005),
+ (6,'EAAAAAAAAAAA',200006),
+ (7,'FAAAAAAAAAAA',200007),
+ (8,'GAAAAAAAAAAA',200008),
+ (9,'HAAAAAAAAAA',200009),
+ (10,'IAAAAAAAAAAA',200010),
+ (11,'JAAAAAAAAAAA',200011),
+ (12,'KAAAAAAAAAAA',200012),
+ (13,'LAAAAAAAAAAA',200013),
+ (14,'MAAAAAAAAAAA',200014),
+ (15,'NAAAAAAAAAAA',200015),
+ (16,'OAAAAAAAAAAA',200016),
+ (17,'PAAAAAAAAAAA',200017),
+ (18,'QAAAAAAAAAAA',200018),
+ (19,'RAAAAAAAAAAA',200019),
+ (20,'SAAAAAAAAAAA',200020);
 UPDATE order SET book_id=829478 WHERE name='Marias Diary';
-SELECT id, name, book_id FROM order WHERE name>'A';
+SELECT id, name, book_id FROM order WHERE name>'B';
 SELECT id, name FROM book WHERE id=200955;
-UPDATE order SET book_id=200955 WHERE name='Marias Diary';
-SELECT id, name, book_id FROM order WHERE name>'A';
+UPDATE order SET book_id=200010 WHERE name='Marias Diary';
+SELECT id, name, book_id FROM order WHERE name>'B';
+SELECT * FROM book WHERE author like '%David%';
+SELECT * FROM book WHERE id = 200001 OR (id > 200003 AND id < 200007) OR (author='Julia Oliver');
+SELECT AVG(year) FROM book WHERE id < 200003;
