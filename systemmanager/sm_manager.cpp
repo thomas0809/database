@@ -95,6 +95,7 @@ int SM_Manager::CloseDb(){
 }
 
 int SM_Manager::DropDb(const char *dbname){
+	CloseDb();
 	char command1[80] = "rm -rf ";
 	cout << "SM_Manager::DropDb()" << endl;
 //	char command1[80] = "rd /s ";

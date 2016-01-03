@@ -214,7 +214,18 @@ class QL_Manager {
 	}
         //get record
         cout << "ALL RECORD========= (0_0)=========" << endl;
-	FILE *fp = fopen("../output.csv", "a");
+	FILE *fp = fopen("../output.csv", "w");
+  for (int i = 0; i < nSelAttrs; i++){
+     fprintf(fp, "%s\t", getAttr[i].attrName);
+  }
+  fprintf(fp,"\n");
+  int label_1 = 0;
+  for (int i = 0; i < nSelAttrs; i++){
+    if (SelectPoint == 0 && selAttrs[i].type != NONE){
+      label_1 = 1;
+      break;
+    }
+  }
             for (int i = 0; i < nrid; i++){
                 rmm->OpenFile(relName, attrfh);
         RM_Record tempRec;
@@ -224,7 +235,6 @@ class QL_Manager {
         temp = tempRec.data;
 //      for (int i = 0; i < strlen(temp); i++)
 //          cout << temp[i];
-		fprintf(fp, "result\t");
                 for (int j = 0; j < nSelAttrs; j++){
 //	    cout << getAttr[j].attrName << ": " << getAttr[j].offset << ' ';
             cout << getAttr[j].attrName << ": ";
@@ -330,6 +340,7 @@ class QL_Manager {
                         cout << ", ";
 		}
 		cout << endl;
+    if (label_1 != 1)
 		fprintf(fp, "\n");
 		rmm->CloseFile(attrfh);
             };
@@ -337,11 +348,11 @@ class QL_Manager {
 	//	cout << selAttrs[j].type << endl;
 		if (selAttrs[j].type == MIN || selAttrs[j].type == MAX || selAttrs[j].type == SUM){
 		      cout << getAttr[j].attrName << ": " << p[j] << endl;
-		      fprintf(fp, "%s\t%f\n", getAttr[j].attrName, p[j]);
+		      fprintf(fp, "%f\t", p[j]);
 		}
 		if (selAttrs[j].type == AVG){
 		      cout << getAttr[j].attrName << ": " << (p[j]/(double)all) << endl;
-		      fprintf(fp, "%s\t%f\n", getAttr[j].attrName, (p[j]/(double)all));
+		      fprintf(fp, "%f\t", (p[j]/(double)all));
 		}
 	    }
 	    fclose(fp);
@@ -681,6 +692,10 @@ class QL_Manager {
 //	    cout << "qby -1" << endl;
 //	    for (int i = 0; i < nConditions; i++)
 //		cout << rightRel[i] << endl;
+      FILE *fp = fopen("../output.csv", "w");
+      for (int i = 0; i < nSelAttrs; i++)
+       fprintf(fp, "%s->%s\t", getAttr[i].relName, getAttr[i].attrName);
+     fprintf(fp, "\n");
             while (true){
 		int inCondition = 1;
 		if (nConditions == 0)
@@ -833,7 +848,6 @@ class QL_Manager {
 	    		rmm->CloseFile(attrfh);
 		    }
 		}	
-		FILE *fp = fopen("../output.csv", "a");
 //====================================================================================================
 		if (inCondition == 1){
 		//  cout << "======================correct================== " << endl;
@@ -871,7 +885,7 @@ class QL_Manager {
                         if (getAttr[i].attrType == STRING){
                              char* t = buf;
 			     cout << t;
-			     fprintf(fp, "%d\t", *t);
+			     fprintf(fp, "%s\t", t);
 			}
                         cout << ", ";
 			rfs.CloseScan();
@@ -881,7 +895,6 @@ class QL_Manager {
 		    fprintf(fp, "\n");
 //		    cout << "END PRINT in SELECT" << endl;
 		}
-		fclose(fp);
 //		for (int i = 0; i < nRelations; i++)
 //		    cout << number[i] << ' ';
 //		cout << endl;
@@ -915,6 +928,7 @@ class QL_Manager {
             }
             delete []rid;
             rid = NULL;
+      fclose(fp);
 	    delete []number;
 	    delete []index;
 	    delete []left;
@@ -1350,6 +1364,10 @@ class QL_Manager {
 
             if (!bIsValue && ((lAttrInfo.attrType != rAttrInfo.attrType)
             || (lAttrInfo.attrLength != rAttrInfo.attrLength))){
+                cout << "Updata Error: type is not equal " << endl;
+                return;
+            }
+            if (bIsValue && ((lAttrInfo.attrType != rhsValue.type))){
                 cout << "Updata Error: type is not equal " << endl;
                 return;
             }
