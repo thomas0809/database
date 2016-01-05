@@ -227,7 +227,9 @@ IX\_IndexScan提供的接口和RM\_FileScan完全一致，区别在于IX\_IndexS
 \includegraphics[width=3in]{Figures/vague.png}
 \end{figure}
 
-\subsection{Where子句表达式}
+\subsection{复合查询条件}
+
+复合查询条件指WHERE部分可以有更复杂的逻辑表达。
 
 对于Where子句的处理部分，支持Where条件的逻辑表达式形式，即通过逻辑词and，or和括号连接的逻辑表达式。为了实现此功能，我们在Parse\_Manager中得readWhere函数中建立两个栈用于存储操作数(RID的列表)和操作符(包括'and', 'or', '(', ')')，并根据优先级顺序进行计算。每次遇到一个条件，首先通过search函数查找符合此条件的RID的集合，然后通过and，or运算求这些RID集合的交或并。等到所有的条件输入完毕，将求出的RID的集合对应的记录值输出。
 
