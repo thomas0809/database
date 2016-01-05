@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.14159265-2.6-0.99992 (TeX Live 2015) (preloaded format=xelatex 2015.11.29)  3 JAN 2016 23:55
+This is XeTeX, Version 3.14159265-2.6-0.99992 (TeX Live 2015) (preloaded format=xelatex 2015.11.29)  6 JAN 2016 00:13
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -2151,19 +2151,27 @@ Chapter 1.
 
  (./Chapters/Chapter2.tex
 Chapter 2.
-LaTeX Font Info:    Font shape `T1/ppl/bx/n' in size <14.4> not available
-(Font)              Font shape `T1/ppl/b/n' tried instead on input line 11.
-)
+File: Figures/structure.jpg Graphic file (type QTm)
+<use  "Figures/structure.jpg" >
 1: section
 [2
 
 
 
 ]
+File: Figures/DB.jpg Graphic file (type QTm)
+ <use  "Figures/DB.jpg" >)
+LaTeX Font Info:    Font shape `EU1/FandolSong-Regular(0)/m/sl' in size <10.95>
+ not available
+(Font)              Font shape `EU1/FandolSong-Regular(0)/m/it' tried instead o
+n input line 170.
+ [3]
 \openout2 = `Chapters/Chapter3.aux'.
 
  (./Chapters/Chapter3.tex
 Chapter 3.
+LaTeX Font Info:    Font shape `T1/ppl/bx/n' in size <14.4> not available
+(Font)              Font shape `T1/ppl/b/n' tried instead on input line 7.
 File: Figures/FileHead.png Graphic file (type QTm)
 <use  "Figures/FileHead.png" >
 File: Figures/PageHead.png Graphic file (type QTm)
@@ -2172,31 +2180,57 @@ File: Figures/RM_Manager.png Graphic file (type QTm)
 
 <use  "Figures/RM_Manager.png" >
 1: section
-[3
+[4
 
 
 
 ]
+Overfull \hbox (41.89192pt too wide) in paragraph at lines 33--34
+\EU1/FandolSong-Regular(0)/m/n/10.95 页；| \T1/ppl/m/n/10.95 (2)De-stroy-File\EU1
+/FandolSong-Regular(0)/m/n/10.95 ：|  删 除 一 个 文 件；| \T1/ppl/m/n/10.95 (3)Open-Fi
+le\EU1/FandolSong-Regular(0)/m/n/10.95 ：|  打 开 一 个 文 件，|  得 到 一 个 \T1/ppl/m/n/1
+0.95 RM_FileHandle\EU1/FandolSong-Regular(0)/m/n/10.95 ，|
+ []
+
 File: Figures/RM_FileHandle.png Graphic file (type QTm)
- <use  "Figures/RM_FileHandle.png" >
+<use  "Figures/RM_FileHandle.png" >
 File: Figures/RM_FileScan.png Graphic file (type QTm)
- <use  "Figures/RM_FileScan.png" >
-LaTeX Font Info:    Font shape `EU1/FandolSong-Regular(0)/m/sl' in size <10.95>
- not available
-(Font)              Font shape `EU1/FandolSong-Regular(0)/m/it' tried instead o
-n input line 56.
+ <use  "Figures/RM_FileScan.png" > [5]
+File: Figures/SM_Manager.jpg Graphic file (type QTm)
 
-[4]
+<use  "Figures/SM_Manager.jpg" >
+File: Figures/AttrInfo.jpg Graphic file (type QTm)
+ <use  "Figures/AttrInfo.jpg" > [6]
+File: Figures/TableInfo.jpg Graphic file (type QTm)
+
+<use  "Figures/TableInfo.jpg" >
+File: Figures/Value.jpg Graphic file (type QTm)
+ <use  "Figures/Value.jpg" >
+File: Figures/Condition.jpg Graphic file (type QTm)
+
+<use  "Figures/Condition.jpg" > [7]
+File: Figures/relAttr.jpg Graphic file (type QTm)
+ <use  "Figures/relAttr.jpg" >
+Overfull \hbox (4.8929pt too wide) in paragraph at lines 97--98
+[]\T1/ppl/m/n/10.95 type \EU1/FandolSong-Regular(0)/m/n/10.95 为 数 据 类 型；| \T1/p
+pl/m/n/10.95 rel-Name \EU1/FandolSong-Regular(0)/m/n/10.95 为 所 属 关 系 名 称；| \T1/
+ppl/m/n/10.95 at-tr-Name \EU1/FandolSong-Regular(0)/m/n/10.95 为 属 性 名 称；| \T1/p
+pl/m/n/10.95 out-keyrel
+ []
+
+File: Figures/QL_Manager.jpg Graphic file (type QTm)
+<use  "Figures/QL_Manager.jpg" > [8]
 File: Figures/Parse_manager.png Graphic file (type QTm)
- <use  "Figures/Parse_manager.png" > [5]
+ <use  "Figures/Parse_manager.png" >
+[9]
 File: Figures/IX_FileHead.png Graphic file (type QTm)
- <use  "Figures/IX_FileHead.png" >
+ <use  "Figures/IX_FileHead.png" > [10]
 File: Figures/IX_PageHead.png Graphic file (type QTm)
-
-<use  "Figures/IX_PageHead.png" >
+ <use  "Figures/IX_PageHead.png" >
 File: Figures/indexstruct.png Graphic file (type QTm)
- <use  "Figures/indexstruct.png" >
-Overfull \hbox (27.4719pt too wide) in paragraph at lines 99--100
+
+<use  "Figures/indexstruct.png" >
+Overfull \hbox (27.4719pt too wide) in paragraph at lines 175--176
 []\EU1/FandolSong-Regular(0)/m/n/10.95 索 引 模 块 的 实 现 仿 照 记 录 管 理 模 块，|  主 要 包 括
  \T1/ppl/m/n/10.95 3 \EU1/FandolSong-Regular(0)/m/n/10.95 个 类，|  即 \T1/ppl/m/n/
 10.95 IX_Manager\EU1/FandolSong-Regular(0)/m/n/10.95 、| \T1/ppl/m/n/10.95 IX_In
@@ -2204,24 +2238,24 @@ dexHandle
  []
 
 File: Figures/IX_Manager.png Graphic file (type QTm)
-<use  "Figures/IX_Manager.png" > [6]
+<use  "Figures/IX_Manager.png" > [11]
 File: Figures/IX_IndexHandle.png Graphic file (type QTm)
  <use  "Figures/IX_IndexHandle.png" >
 File: Figures/IX_IndexScan.png Graphic file (type QTm)
 
-<use  "Figures/IX_IndexScan.png" > [7]
+<use  "Figures/IX_IndexScan.png" > [12]
 LaTeX Font Info:    Font shape `T1/ppl/bx/n' in size <12> not available
-(Font)              Font shape `T1/ppl/b/n' tried instead on input line 126.
+(Font)              Font shape `T1/ppl/b/n' tried instead on input line 202.
 File: Figures/vague.png Graphic file (type QTm)
- <use  "Figures/vague.png" >) [8]
-[9]
+ <use  "Figures/vague.png" > [13])
+[14]
 \openout2 = `Chapters/Chapter4.aux'.
 
  (./Chapters/Chapter4.tex
 Chapter 4.
 )
 1: section
-[10
+[15
 
 
 
@@ -2232,7 +2266,7 @@ Chapter 4.
 Chapter 5.
 )
 1: section
-[11
+[16
 
 
 
@@ -2243,7 +2277,7 @@ Chapter 5.
 Chapter 6.
 )
 1: section
-[12
+[17
 
 
 
@@ -2264,12 +2298,12 @@ Package logreq Info: Writing requests to 'main.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 39519 strings out of 493706
- 854154 string characters out of 6145768
- 953845 words of memory out of 5000000
- 42415 multiletter control sequences out of 15000+600000
+ 39547 strings out of 493706
+ 855068 string characters out of 6145768
+ 954845 words of memory out of 5000000
+ 42433 multiletter control sequences out of 15000+600000
  23869 words of font info for 61 fonts, out of 8000000 for 9000
  1328 hyphenation exceptions out of 8191
- 63i,20n,84p,10377b,1823s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 63i,20n,90p,10377b,1823s stack positions out of 5000i,500n,10000p,200000b,80000s
 
-Output written on main.pdf (14 pages).
+Output written on main.pdf (19 pages).
