@@ -333,7 +333,7 @@ void Parse_Manager::readInsertData(char* relName, int nattr, AttrInfo* attrs){
 
 void Parse_Manager::MainLoop(SM_Manager *smm, RM_Manager *rmm, IX_Manager *ixm) {
 
-	string instruction = string("python parser.py ") + filename + string("> tmp");
+	string instruction = string("python python/parser.py ") + filename + string("> tmp");
 	system(instruction.c_str());
 
 	fp = fopen("tmp.gen", "r");

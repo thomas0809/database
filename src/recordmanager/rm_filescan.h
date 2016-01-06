@@ -77,7 +77,7 @@ public:	bool condINT(int v1, int v2){
 		FILE *fp = fopen("../vague", "w");
 		fprintf(fp, "%s\n%s", v1, v2);
 		fclose(fp);
-		string s1 = "python ../recordmanager/vague.py";
+		string s1 = "python ../python/vague.py";
 		system(s1.c_str());
 
 		fp = fopen("../vague", "r");
